@@ -1,6 +1,8 @@
 use core::mem;
 use core::slice;
 
+use untrusted::Input;
+
 pub const XDP_PACKET_HEADROOM: usize = 256;
 
 /// User return codes for XDP prog type.
@@ -28,6 +30,12 @@ pub struct Metadata {
 }
 
 impl Metadata {
+    #[inline]
+    pub fn input(&self) -> Option<Input> {
+        unsafe { self.data().map(Input::from) }
+    }
+
+    #[inline]
     pub unsafe fn data(&self) -> Option<&[u8]> {
         if self.data != 0 && self.data < self.data_end {
             Some(slice::from_raw_parts(
@@ -39,6 +47,7 @@ impl Metadata {
         }
     }
 
+    #[inline]
     pub unsafe fn data_mut(&self) -> Option<&mut [u8]> {
         if self.data != 0 && self.data < self.data_end {
             Some(slice::from_raw_parts_mut(
@@ -50,6 +59,7 @@ impl Metadata {
         }
     }
 
+    #[inline]
     pub unsafe fn as_ptr<T>(&self) -> Option<&mut T> {
         if self.data != 0
             && self.data < self.data_end

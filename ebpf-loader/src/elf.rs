@@ -265,7 +265,9 @@ impl<'a> Parser<goblin::elf::Elf<'a>> {
 
                     trace!("reloc insn #{}", insn_idx);
 
-                    if Opcode::from_bits_truncate(prog.insns[insn_idx].code) != Opcode::LD | Opcode::IMM | Opcode::DW {
+                    if Opcode::from_bits_truncate(prog.insns[insn_idx].code)
+                        != Opcode::LD | Opcode::IMM | Opcode::DW
+                    {
                         bail!(
                             "invalid relocate for insns[{}].code = {:?}",
                             insn_idx,

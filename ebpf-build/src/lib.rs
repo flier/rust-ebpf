@@ -7,10 +7,12 @@ use std::io::prelude::*;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
+use ebpf_sys::BPF_MAXINSNS;
 use failure::{format_err, Error, ResultExt};
 
 const DEFAULT_OPT_LEVEL: usize = 3; // all optimizations
 const DEFAULT_DEBUG_INFO: usize = 0; // no debug info at all
+const DEFAULT_INLINE_THRESHOLD: usize = BPF_MAXINSNS as usize;
 const DEFAULT_TARGET: &str = "bpf";
 
 #[derive(Debug, Default)]
@@ -73,6 +75,11 @@ impl Builder {
 
     pub fn debug_info(mut self, debug_info: usize) -> Self {
         self.debug_info = Some(debug_info);
+        self
+    }
+
+    pub fn inline_threshold(mut self, inline_threshold: usize) -> Self {
+        self.inline_threshold = Some(inline_threshold);
         self
     }
 
@@ -167,6 +174,11 @@ impl Builder {
                 "opt-level={}",
                 self.opt_level.unwrap_or(DEFAULT_OPT_LEVEL)
             ))
+            .arg("--codegen")
+            .arg(format!(
+                "inline-threshold={}",
+                self.inline_threshold.unwrap_or(DEFAULT_INLINE_THRESHOLD)
+            ))
             .arg("--out-dir")
             .arg(&out_dir)
             .arg("-L")
@@ -190,12 +202,6 @@ impl Builder {
         }
         for opt in self.codegen_opts {
             rustc.arg("--codegen").arg(opt);
-        }
-
-        if let Some(inline_threshold) = self.inline_threshold {
-            rustc
-                .arg("--codegen")
-                .arg(format!("inline-threshold={}", inline_threshold));
         }
 
         for pkgid in self

@@ -11,3 +11,5 @@ glob = "0.3"
 cargo_metadata = "0.8"
 
 syn = { version = "0.15", features = ["full"] }
+
+ebpf-sys = { version = "0.1", path = "../ebpf-sys" }

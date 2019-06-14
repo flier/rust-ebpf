@@ -5,4 +5,6 @@ authors = ["Flier Lu <flier.lu@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+untrusted = { git = "https://github.com/flier/untrusted.git", branch = "inline_always", features = ["inline_always"] }
+
 ebpf-runtime = { version = "0.1", path = "../ebpf-runtime" }
