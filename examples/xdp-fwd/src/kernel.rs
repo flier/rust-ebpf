@@ -15,14 +15,12 @@ map! {
     tx_port: DevMap[i32]i32 { 64 }
 }
 
-#[no_mangle]
-#[link_section = "xdp_fwd"]
+#[program(name = "xdp_fwd")]
 pub unsafe extern "C" fn xdp_fwd_prog(md: &Metadata) -> Action {
     xdp_fwd_flags(md, 0)
 }
 
-#[no_mangle]
-#[link_section = "xdp_fwd_direct"]
+#[program(name = "xdp_fwd_direct")]
 pub unsafe extern "C" fn xdp_fwd_direct_prog(md: &Metadata) -> Action {
     xdp_fwd_flags(md, ffi::BPF_FIB_LOOKUP_DIRECT)
 }

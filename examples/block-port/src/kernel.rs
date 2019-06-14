@@ -23,8 +23,7 @@ struct eth_hdr {
     eth_proto: u16,
 }
 
-#[no_mangle]
-#[link_section = "xdp/balancer"]
+#[program(name = "xdp/balancer")]
 pub unsafe extern "C" fn handle_ingress(md: &Metadata) -> Action {
     match md.as_ptr::<eth_hdr>() {
         Some(eth) => match u16::from_be(eth.eth_proto) {
