@@ -1,0 +1,12 @@
+[workspace]
+members = [
+    "ebpf-build",
+    "ebpf-core",
+    "ebpf-derive",
+    "ebpf-loader",
+    "ebpf-runtime",
+    "ebpf-sys",
+    "xdp-runtime",
+    "examples/block-port",
+    "examples/xdp-fwd",
+]

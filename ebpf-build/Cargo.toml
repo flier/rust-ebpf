@@ -1,0 +1,13 @@
+[package]
+name = "ebpf-build"
+version = "0.1.0"
+authors = ["Flier Lu <flier.lu@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+log = "0.4"
+failure = "0.1"
+glob = "0.3"
+cargo_metadata = "0.8"
+
+syn = { version = "0.15", features = ["full"] }

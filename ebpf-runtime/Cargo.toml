@@ -1,0 +1,10 @@
+[package]
+name = "ebpf-runtime"
+version = "0.1.0"
+authors = ["Flier Lu <flier.lu@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+ebpf-core = { version = "0.1", path = "../ebpf-core" }
+ebpf-sys = { version = "0.1", path = "../ebpf-sys" }
+ebpf-derive = { version = "0.1", path = "../ebpf-derive" }

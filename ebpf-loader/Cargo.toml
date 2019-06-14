@@ -1,0 +1,13 @@
+[package]
+name = "ebpf-loader"
+version = "0.1.0"
+authors = ["Flier Lu <flier.lu@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+log = "0.4"
+failure = "0.1"
+goblin = "0.0.22"
+scroll = "0.9"
+
+ebpf-core = { version = "0.1", path = "../ebpf-core" }

@@ -1,0 +1,8 @@
+[package]
+name = "xdp-runtime"
+version = "0.1.0"
+authors = ["Flier Lu <flier.lu@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+ebpf-runtime = { version = "0.1", path = "../ebpf-runtime" }
