@@ -13,7 +13,6 @@ const IPPROTO_TCP: u16 = 6;
 const IPPROTO_UDP: u16 = 17;
 
 license! { "GPL" }
-
 version! { 0xFFFFFFFE }
 
 #[repr(C)]

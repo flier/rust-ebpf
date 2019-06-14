@@ -31,7 +31,7 @@ pub enum Reloc {
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct Insn {
     /// opcode
-    pub code: Opcode,
+    pub code: u8,
     /// dest register
     pub reg: u8,
     /// signed offset

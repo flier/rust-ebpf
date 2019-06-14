@@ -42,7 +42,7 @@ impl Default for Type {
 #[derive(Debug)]
 pub struct Map {
     pub name: String,
-    pub idx: usize,
+    pub offset: usize,
     pub spec: Spec,
 }
 
@@ -75,7 +75,7 @@ bitflags! {
 impl Map {
     pub fn with_def<S: Into<String>>(
         name: S,
-        idx: usize,
+        offset: usize,
         def: &ffi::bpf_map_def,
     ) -> Result<Self, Error> {
         let ty = Type::from_u32(def.type_)
@@ -83,7 +83,7 @@ impl Map {
 
         Ok(Map {
             name: name.into(),
-            idx,
+            offset,
             spec: Spec {
                 ty,
                 key_size: def.key_size,
@@ -94,10 +94,10 @@ impl Map {
         })
     }
 
-    pub fn with_spec<S: Into<String>>(name: S, idx: usize, spec: Spec) -> Self {
+    pub fn with_spec<S: Into<String>>(name: S, offset: usize, spec: Spec) -> Self {
         Map {
             name: name.into(),
-            idx,
+            offset,
             spec,
         }
     }

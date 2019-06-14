@@ -18,5 +18,7 @@ fn main() -> Result<(), Error> {
 
     let m = ebpf_loader::parse(KERNEL)?;
 
+    trace!("loaded kernel: {:#?}", m);
+
     Ok(())
 }

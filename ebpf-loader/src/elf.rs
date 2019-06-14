@@ -35,72 +35,71 @@ impl<'a> Parser<goblin::elf::Elf<'a>> {
         let mut text_section = None;
 
         for (idx, sec) in self.obj.section_headers.iter().enumerate() {
-            if let Some(Ok(name)) = self.obj.strtab.get(sec.sh_name) {
-                trace!("parse `{}` section: {:?}", name, sec);
+            let name = self.resolve_name(sec.sh_name)?;
+            trace!("parse `{}` section: {:?}", name, sec);
 
-                let section_data = || {
-                    buf.get(sec.file_range()).ok_or_else(|| {
-                        format_err!(
-                            "`{}` section data {:?} out of bound",
-                            name,
-                            sec.file_range()
-                        )
-                    })
-                };
+            let section_data = || {
+                buf.get(sec.file_range()).ok_or_else(|| {
+                    format_err!(
+                        "`{}` section data {:?} out of bound",
+                        name,
+                        sec.file_range()
+                    )
+                })
+            };
 
-                match name {
-                    BPF_LICENSE_SEC if sec.sh_type == SHT_PROGBITS => {
-                        license = Some(
-                            CStr::from_bytes_with_nul(section_data()?)?
-                                .to_str()?
-                                .to_owned(),
-                        );
+            match name {
+                BPF_LICENSE_SEC if sec.sh_type == SHT_PROGBITS => {
+                    license = Some(
+                        CStr::from_bytes_with_nul(section_data()?)?
+                            .to_str()?
+                            .to_owned(),
+                    );
 
-                        debug!("kernel license: {}", license.as_ref().unwrap());
+                    debug!("kernel license: {}", license.as_ref().unwrap());
+                }
+                BPF_VERSION_SEC if sec.sh_type == SHT_PROGBITS => {
+                    version = Some(u32::from_ne_bytes(section_data()?.try_into()?));
+
+                    debug!("kernel version: {:x}", version.as_ref().unwrap());
+                }
+                BPF_MAPS_SEC => {
+                    debug!("`{}` section", name);
+
+                    maps_section = Some((idx, sec));
+                }
+                BTF_ELF_SEC => {
+                    // TODO btf__new
+                    debug!("`{}` section", name);
+                }
+                BTF_EXT_ELF_SEC => {
+                    // TODO btf_ext_data
+                    debug!("`{}` section", name);
+                }
+                _ if sec.sh_type == SHT_PROGBITS && sec.is_executable() && sec.sh_size > 0 => {
+                    if name == ".text" {
+                        text_section = Some(idx);
                     }
-                    BPF_VERSION_SEC if sec.sh_type == SHT_PROGBITS => {
-                        version = Some(u32::from_ne_bytes(section_data()?.try_into()?));
 
-                        debug!("kernel version: {:x}", version.as_ref().unwrap());
-                    }
-                    BPF_MAPS_SEC => {
-                        debug!("`{}` section", name);
+                    let insns = unsafe {
+                        let data = buf.as_ptr().add(sec.sh_offset as usize);
+                        let len = sec.sh_size as usize / mem::size_of::<Insn>();
 
-                        maps_section = Some((idx, sec));
-                    }
-                    BTF_ELF_SEC => {
-                        // TODO btf__new
-                        debug!("`{}` section", name);
-                    }
-                    BTF_EXT_ELF_SEC => {
-                        // TODO btf_ext_data
-                        debug!("`{}` section", name);
-                    }
-                    _ if sec.sh_type == SHT_PROGBITS && sec.is_executable() && sec.sh_size > 0 => {
-                        if name == ".text" {
-                            text_section = Some(idx);
-                        }
+                        slice::from_raw_parts(data as *const _, len)
+                    };
 
-                        let insns = unsafe {
-                            let data = buf.as_ptr().add(sec.sh_offset as usize);
-                            let len = sec.sh_size as usize / mem::size_of::<Insn>();
+                    debug!(
+                        "kernel program #{} @ section `{}` with {} insns",
+                        idx,
+                        name,
+                        insns.len()
+                    );
 
-                            slice::from_raw_parts(data as *const _, len)
-                        };
-
-                        debug!(
-                            "kernel program #{} @ section `{}` with {} insns",
-                            idx,
-                            name,
-                            insns.len()
-                        );
-
-                        programs.push((name, idx, insns.to_vec()));
-                    }
-                    _ if sec.sh_type == SHT_REL => {}
-                    _ => {
-                        trace!("ignore `{}` section", name);
-                    }
+                    programs.push((name, idx, insns.to_vec()));
+                }
+                _ if sec.sh_type == SHT_REL => {}
+                _ => {
+                    trace!("ignore `{}` section", name);
                 }
             }
         }
@@ -168,12 +167,23 @@ impl<'a> Parser<goblin::elf::Elf<'a>> {
                     .iter()
                     .any(|&b| b != 0)
             {
-                debug!("maps: {:?}", data);
                 bail!("maps section has unrecognized, non-zero options");
             }
 
-            maps.push(Map::with_def(name, idx, &map_def)?)
+            let map = Map::with_def(name, sym.st_value as usize, &map_def)?;
+
+            debug!(
+                "#{} map `{}` @ section `{}`: {:?}",
+                maps.len(),
+                name,
+                self.resolve_name(sec.sh_name)?,
+                map
+            );
+
+            maps.push(map)
         }
+
+        maps.sort_by_cached_key(|map| map.offset);
 
         Ok(maps)
     }
@@ -188,15 +198,14 @@ impl<'a> Parser<goblin::elf::Elf<'a>> {
             .map(|(title, idx, insns)| {
                 let name = self
                     .resolve_symbol(|sym| sym.st_shndx == idx && sym.st_bind() == STB_GLOBAL)
-                    .and_then(|sym| self.resolve_name(sym.st_name))?
-                    .or_else(|| {
+                    .and_then(|sym| self.resolve_name(sym.st_name))
+                    .or_else(|_| {
                         if text_section == Some(idx) {
-                            Some(".text")
+                            Ok(".text")
                         } else {
-                            None
+                            Err(format_err!("program `{}` symbol not found", title))
                         }
-                    })
-                    .ok_or_else(|| format_err!("not found symbol for program {}", title))?;
+                    })?;
 
                 debug!(
                     "#{} program `{}` @ secion `{}` with {} insns",
@@ -219,12 +228,12 @@ impl<'a> Parser<goblin::elf::Elf<'a>> {
             .ok_or_else(|| format_err!("symbol not found"))
     }
 
-    fn resolve_name(&self, idx: usize) -> Result<Option<&str>, Error> {
+    fn resolve_name(&self, idx: usize) -> Result<&str, Error> {
         self.obj
             .strtab
             .get(idx)
-            .transpose()
-            .map_err(|err| err.context(format!("name #{} not found", idx)).into())
+            .ok_or_else(|| format_err!("index out of bound"))?
+            .map_err(|err| err.context("read string").into())
     }
 
     fn relocate_programs(
@@ -256,7 +265,7 @@ impl<'a> Parser<goblin::elf::Elf<'a>> {
 
                     trace!("reloc insn #{}", insn_idx);
 
-                    if prog.insns[insn_idx].code != Opcode::LD | Opcode::IMM | Opcode::DW {
+                    if Opcode::from_bits_truncate(prog.insns[insn_idx].code) != Opcode::LD | Opcode::IMM | Opcode::DW {
                         bail!(
                             "invalid relocate for insns[{}].code = {:?}",
                             insn_idx,
@@ -264,15 +273,12 @@ impl<'a> Parser<goblin::elf::Elf<'a>> {
                         );
                     }
 
-                    let map = maps
+                    let map_idx = maps
                         .iter()
-                        .find(|map| map.idx == sym.st_value as usize)
-                        .ok_or_else(|| format_err!("map #{} not found", sym.st_value))?;
+                        .position(|map| map.offset == sym.st_value as usize)
+                        .ok_or_else(|| format_err!("map @ {} not found", sym.st_value))?;
 
-                    prog.relocs.push(prog::Reloc::LD64 {
-                        insn_idx,
-                        map_idx: map.idx,
-                    })
+                    prog.relocs.push(prog::Reloc::LD64 { insn_idx, map_idx })
                 }
             }
         }

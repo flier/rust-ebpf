@@ -13,7 +13,8 @@ macro_rules! version {
 
 #[macro_export]
 macro_rules! map {
-    ($name:ident : $ty:ident [ $key:ty ] $value:ty { $capacity:expr } ) => {
+    () => {};
+    ( $name:ident : $ty:ident { [ $key:ty ] $value:ty ; $capacity:expr } $($rest:tt)* ) => {
         #[no_mangle]
         #[link_section = "maps"]
         pub static $name: $crate::MapSpec = $crate::MapSpec {
@@ -23,5 +24,7 @@ macro_rules! map {
             capacity: $capacity,
             flags: $crate::MapFlags::empty(),
         };
+
+        map!{ $($rest)* }
     };
 }

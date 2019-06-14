@@ -8,11 +8,11 @@ use ebpf_runtime::ffi;
 use xdp_runtime::{Action, Metadata};
 
 license!{ "GPL" }
-
 version! { 0xFFFFFFFE }
 
 map! {
-    tx_port: DevMap[i32]i32 { 64 }
+    tx_port: DevMap { [i32]i32; 64 }
+    rx_port: DevMap { [i32]i32; 64 }
 }
 
 #[program(name = "xdp_fwd")]
