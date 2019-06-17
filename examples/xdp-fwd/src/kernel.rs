@@ -7,7 +7,7 @@ use std::mem;
 
 use ebpf_runtime::ffi;
 use untrusted::{EndOfInput, Reader};
-use xdp_runtime::{Action, Metadata};
+use xdp_runtime::{Action, Metadata, net::{ether, ipv4, ipv6, sock, Readable}};
 
 license! { "GPL" }
 version! { 0xFFFFFFFE }
@@ -37,7 +37,32 @@ fn xdp_fwd_flags(md: &Metadata, flags: u32) -> Action {
 }
 
 fn read_packet(r: &mut Reader, flags: u32) -> Result<Action, EndOfInput> {
-    r.skip_to_end();
+    let mut fib_params: ffi::bpf_fib_lookup = unsafe { mem::zeroed() };
+    let eth = ether::Header::read(r)?;
+
+    match eth.proto() {
+        ether::ETH_P_IP => {
+            let iph = ipv4::Header::read(r)?;
+
+            fib_params.family = sock::AF_INET;
+            fib_params.__bindgen_anon_1.tos = iph.tos;
+            fib_params.l4_protocol = iph.protocol;
+            fib_params.tot_len = iph.total_len();
+            fib_params.__bindgen_anon_2.ipv4_src = iph.saddr.into();
+            fib_params.__bindgen_anon_3.ipv4_dst = iph.daddr.into();
+        }
+        ether::ETH_P_IPV6 => {
+            let ip6h = ipv6::Header::read(r)?;
+
+            fib_params.family= sock::AF_INET6;
+            fib_params.__bindgen_anon_1.flowinfo = ip6h.flowinfo();
+            fib_params.l4_protocol = ip6h.nexthdr;
+            fib_params.tot_len = ip6h.payload_len();
+            fib_params.__bindgen_anon_2.ipv6_src = ip6h.saddr.into();
+            fib_params.__bindgen_anon_3.ipv6_dst = ip6h.daddr.into();
+        }
+        _ => {}
+    }
 
     Ok(Action::Pass)
 }
