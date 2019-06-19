@@ -12,6 +12,8 @@ pretty_env_logger = "0.3"
 ebpf-loader = { version = "0.1", path = "../../ebpf-loader" }
 
 [build-dependencies]
+log = "0.4"
+failure = "0.1"
 pretty_env_logger = "0.3"
 
 ebpf-build = { version = "0.1", path = "../../ebpf-build" }

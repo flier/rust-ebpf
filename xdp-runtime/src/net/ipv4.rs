@@ -1,7 +1,9 @@
 use core::convert::From;
 use core::fmt;
 
-use crate::net::{be16, be32, sum16, Readable};
+use ebpf_runtime::{be16, be32, sum16};
+
+use crate::net::Readable;
 
 #[repr(C, packed)]
 #[derive(Clone, Copy, Debug)]
@@ -22,6 +24,7 @@ pub struct Header {
 impl Readable for Header {}
 
 impl Header {
+    #[inline]
     pub fn total_len(&self) -> u16 {
         u16::from_be(self.tot_len)
     }
@@ -36,33 +39,38 @@ pub union Addr {
 }
 
 impl Addr {
-    pub fn octets(&self) -> [u8; 4] {
+    #[inline]
+    pub fn octets(self) -> [u8; 4] {
         unsafe { self.octets }
     }
 
-    pub fn hextets(&self) -> [u16; 2] {
+    #[inline]
+    pub fn hextets(self) -> [u16; 2] {
         unsafe { self.hextets }
     }
 
-    pub fn quadlet(&self) -> be32 {
+    #[inline]
+    pub fn quadlet(self) -> be32 {
         unsafe { self.quadlet }
     }
 }
 
 macro_rules! impl_from {
-	($name:ident : $ty:ty) => {
-		impl From<$ty> for Addr {
-			fn from($name: $ty) -> Self {
-				Addr { $name }
-			}
-		}
+    ($name:ident : $ty:ty) => {
+        impl From<$ty> for Addr {
+            #[inline]
+            fn from($name: $ty) -> Self {
+                Addr { $name }
+            }
+        }
 
-		impl From<Addr> for $ty {
-			fn from(addr: Addr) -> $ty {
-				unsafe { addr.$name }
-			}
-		}
-	};
+        impl From<Addr> for $ty {
+            #[inline]
+            fn from(addr: Addr) -> $ty {
+                unsafe { addr.$name }
+            }
+        }
+    };
 }
 
 impl_from!(octets: [u8; 4]);

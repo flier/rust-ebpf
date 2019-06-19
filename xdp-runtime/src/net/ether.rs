@@ -1,4 +1,10 @@
-use crate::net::{be16, Readable};
+#![allow(clippy::many_single_char_names)]
+
+use core::fmt;
+
+use ebpf_runtime::be16;
+
+use crate::net::Readable;
 
 pub const ETH_ALEN: usize = 6;
 
@@ -149,6 +155,7 @@ pub struct Header {
 impl Readable for Header {}
 
 impl Header {
+    #[inline]
     pub fn proto(&self) -> u16 {
         u16::from_be(self.proto)
     }
@@ -157,3 +164,29 @@ impl Header {
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct MacAddr([u8; ETH_ALEN]);
+
+impl From<[u8; ETH_ALEN]> for MacAddr {
+    #[inline]
+    fn from(octets: [u8; ETH_ALEN]) -> Self {
+        MacAddr(octets)
+    }
+}
+
+impl From<MacAddr> for [u8; ETH_ALEN] {
+    #[inline]
+    fn from(addr: MacAddr) -> [u8; ETH_ALEN] {
+        addr.0
+    }
+}
+
+impl fmt::Display for MacAddr {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        let &[a, b, c, d, e, f] = &self.0;
+
+        write!(
+            fmt,
+            "{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}",
+            a, b, c, d, e, f
+        )
+    }
+}

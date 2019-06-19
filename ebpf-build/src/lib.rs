@@ -3,7 +3,7 @@ extern crate log;
 
 use std::env;
 use std::fs::File;
-use std::io::prelude::*;
+use std::io::{self, prelude::*};
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
@@ -225,14 +225,21 @@ impl Builder {
         Command::new(llc)
             .arg(format!(
                 "-march={}",
-                self.target.unwrap_or(DEFAULT_TARGET.to_owned())
+                self.target.unwrap_or_else(|| DEFAULT_TARGET.to_owned())
             ))
             .arg("-filetype=obj")
             .arg(&bc_file)
             .arg("-o")
             .arg(&obj_file)
             .run()
-            .context("generate eBPF kernel")?;
+            .map_err(
+                |err| match err.find_root_cause().downcast_ref::<io::Error>() {
+                    Some(ref err) if err.kind() == io::ErrorKind::NotFound => {
+                        format_err!("command `llc` not found in path, please install LLVM first or point to with `LLC=<path>`")
+                    }
+                    _ => err.context("generate eBPF kernel").into(),
+                },
+            )?;
 
         println!("cargo:rerun-if-changed={}", kernel_file.to_string_lossy());
         println!("cargo:rerun-if-env-changed=LLC");

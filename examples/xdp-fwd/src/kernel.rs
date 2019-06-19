@@ -5,7 +5,7 @@ extern crate xdp_runtime;
 
 use std::mem;
 
-use ebpf_runtime::ffi;
+use ebpf_runtime::{ffi, bpf_fib_lookup};
 use untrusted::{EndOfInput, Reader};
 use xdp_runtime::{Action, Metadata, net::{ether, ipv4, ipv6, sock, Readable}};
 
@@ -30,13 +30,13 @@ fn xdp_fwd_flags(md: &Metadata, flags: u32) -> Action {
         .ok_or(Action::Drop)
         .and_then(|input| {
             input.read_all(Action::Drop, |reader| {
-                read_packet(reader, flags).map_err(|_| Action::Drop)
+                read_packet(md, reader, flags).map_err(|_| Action::Drop)
             })
         })
         .unwrap_or(Action::Drop)
 }
 
-fn read_packet(r: &mut Reader, flags: u32) -> Result<Action, EndOfInput> {
+fn read_packet(md: &Metadata, r: &mut Reader, flags: u32) -> Result<Action, EndOfInput> {
     let mut fib_params: ffi::bpf_fib_lookup = unsafe { mem::zeroed() };
     let eth = ether::Header::read(r)?;
 
@@ -63,6 +63,10 @@ fn read_packet(r: &mut Reader, flags: u32) -> Result<Action, EndOfInput> {
         }
         _ => {}
     }
+
+    fib_params.ifindex = md.ingress_ifindex;
+
+    let rc = bpf_fib_lookup(md.as_ptr() as *const _, &fib_params, mem::size_of::<ffi::bpf_fib_lookup>() as i32, flags);
 
     Ok(Action::Pass)
 }

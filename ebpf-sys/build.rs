@@ -13,7 +13,7 @@ fn prepare_binding_file() {
             "-Ilibbpf/include/uapi",
         ])
         .whitelist_var("(BPF|LIBBPF|bpf)_.*")
-        .whitelist_type("(bpf|libbpf)_.*")
+        .whitelist_type("(bpf|libbpf|xdp)_.*")
         .whitelist_function("(bpf|btf)_.*")
         .generate()
         .expect("generate bindings")

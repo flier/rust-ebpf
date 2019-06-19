@@ -1,6 +1,18 @@
+#![recursion_limit = "128"]
+#![allow(non_camel_case_types)]
+
+mod helpers;
+pub use helpers::*;
+
 pub use ebpf_core::map::{Flags as MapFlags, Spec as MapSpec, Type as MapType};
 pub use ebpf_derive::*;
 pub use ebpf_sys as ffi;
+
+pub type be16 = u16;
+pub type be32 = u32;
+pub type be64 = u64;
+pub type sum16 = u16;
+pub type wsum = u32;
 
 #[macro_export]
 macro_rules! version {

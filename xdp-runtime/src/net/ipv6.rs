@@ -1,9 +1,15 @@
+#![allow(clippy::many_single_char_names)]
+#![allow(clippy::too_many_arguments)]
+#![allow(clippy::range_plus_one)]
+
 use core::fmt;
 use core::ops::Range;
 
-use crate::net::{be16, be32, Readable};
+use ebpf_runtime::{be16, be32};
 
-pub const IPV6_FLOWINFO_MASK: be32 = 0x0FFFFFFFu32.to_be();
+use crate::net::Readable;
+
+pub const IPV6_FLOWINFO_MASK: be32 = 0x0FFF_FFFFu32.to_be();
 
 #[repr(C, packed)]
 #[derive(Clone, Copy, Debug)]
@@ -20,10 +26,15 @@ pub struct Header {
 impl Readable for Header {}
 
 impl Header {
+    #[inline]
     pub fn flowinfo(&self) -> u32 {
-        unsafe { (self as *const _ as *const u32).read() & IPV6_FLOWINFO_MASK }
+        let &[a, b, c] = &self.flow_lbl;
+        let bytes = [self.version_priority, a, b, c];
+
+        u32::from_be_bytes(bytes) & IPV6_FLOWINFO_MASK
     }
 
+    #[inline]
     pub fn payload_len(&self) -> u16 {
         u16::from_be(self.payload_len)
     }
@@ -38,35 +49,40 @@ pub union Addr {
 }
 
 impl Addr {
+    #[inline]
     pub const fn new(a: u16, b: u16, c: u16, d: u16, e: u16, f: u16, g: u16, h: u16) -> Addr {
         Addr {
             hextets: [a, b, c, d, e, f, g, h],
         }
     }
 
+    #[inline]
     pub fn octets(&self) -> [u8; 16] {
         unsafe { self.octets }
     }
 
+    #[inline]
     pub fn hextets(&self) -> [u16; 8] {
         unsafe { self.hextets }
     }
 
+    #[inline]
     pub fn quadlets(&self) -> [u32; 4] {
         unsafe { self.quadlets }
     }
 }
 
-
 macro_rules! impl_from {
     ($name:ident : $ty:ty) => {
         impl From<$ty> for Addr {
+            #[inline]
             fn from($name: $ty) -> Self {
                 Addr { $name }
             }
         }
 
         impl From<Addr> for $ty {
+            #[inline]
             fn from(addr: Addr) -> $ty {
                 unsafe { addr.$name }
             }
@@ -162,12 +178,6 @@ impl fmt::Debug for Addr {
 
 #[cfg(test)]
 mod tests {
-    cfg_if! {
-        if #[cfg(not(feature = "std"))] {
-            use alloc::string::ToString;
-        }
-    }
-
     use super::*;
 
     #[test]

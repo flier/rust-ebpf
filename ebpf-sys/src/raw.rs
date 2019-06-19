@@ -3026,6 +3026,84 @@ fn bindgen_test_layout_bpf_xdp_sock() {
         )
     );
 }
+pub const xdp_action_XDP_ABORTED: xdp_action = 0;
+pub const xdp_action_XDP_DROP: xdp_action = 1;
+pub const xdp_action_XDP_PASS: xdp_action = 2;
+pub const xdp_action_XDP_TX: xdp_action = 3;
+pub const xdp_action_XDP_REDIRECT: xdp_action = 4;
+pub type xdp_action = u32;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct xdp_md {
+    pub data: __u32,
+    pub data_end: __u32,
+    pub data_meta: __u32,
+    pub ingress_ifindex: __u32,
+    pub rx_queue_index: __u32,
+}
+#[test]
+fn bindgen_test_layout_xdp_md() {
+    assert_eq!(
+        ::std::mem::size_of::<xdp_md>(),
+        20usize,
+        concat!("Size of: ", stringify!(xdp_md))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<xdp_md>(),
+        4usize,
+        concat!("Alignment of ", stringify!(xdp_md))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<xdp_md>())).data as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(xdp_md),
+            "::",
+            stringify!(data)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<xdp_md>())).data_end as *const _ as usize },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(xdp_md),
+            "::",
+            stringify!(data_end)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<xdp_md>())).data_meta as *const _ as usize },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(xdp_md),
+            "::",
+            stringify!(data_meta)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<xdp_md>())).ingress_ifindex as *const _ as usize },
+        12usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(xdp_md),
+            "::",
+            stringify!(ingress_ifindex)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<xdp_md>())).rx_queue_index as *const _ as usize },
+        16usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(xdp_md),
+            "::",
+            stringify!(rx_queue_index)
+        )
+    );
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct bpf_prog_info {

@@ -5,6 +5,7 @@ authors = ["Flier Lu <flier.lu@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+libc = "0.2"
 ebpf-core = { version = "0.1", path = "../ebpf-core" }
 ebpf-sys = { version = "0.1", path = "../ebpf-sys" }
 ebpf-derive = { version = "0.1", path = "../ebpf-derive" }

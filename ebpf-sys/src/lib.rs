@@ -1,6 +1,10 @@
-#![allow(non_upper_case_globals)]
+#![allow(clippy::cast_lossless)]
+#![allow(clippy::trivially_copy_pass_by_ref)]
+#![allow(clippy::unreadable_literal)]
+#![allow(clippy::useless_transmute)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
+#![allow(non_upper_case_globals)]
 
 #[macro_use]
 extern crate cfg_if;
