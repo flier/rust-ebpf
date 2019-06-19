@@ -6,7 +6,19 @@ pub use helpers::*;
 
 pub use ebpf_core::map::{Flags as MapFlags, Spec as MapSpec, Type as MapType};
 pub use ebpf_derive::*;
-pub use ebpf_sys as ffi;
+
+pub mod ffi {
+    pub use ebpf_sys::*;
+
+    pub type pt_reg = ();
+    pub type pt_regs = ();
+    pub type sk_buff = ();
+    pub type sk_msg_buff = ();
+    pub type sk_reuseport_md = ();
+    pub type xdp_buff = ();
+    pub type bpf_sock_ops_kern = ();
+    pub type bpf_perf_event_data = ();
+}
 
 pub type be16 = u16;
 pub type be32 = u32;

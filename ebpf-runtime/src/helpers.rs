@@ -3,15 +3,6 @@ use core::mem;
 
 use crate::{be16, be32, ffi, wsum};
 
-pub type pt_reg = ();
-pub type pt_regs = ();
-pub type sk_buff = ();
-pub type sk_msg_buff = ();
-pub type sk_reuseport_md = ();
-pub type xdp_buff = ();
-pub type bpf_sock_ops_kern = ();
-pub type bpf_perf_event_data = ();
-
 macro_rules! ebpf_helpers {
     () => {};
     ( $(#[$attr:meta])* fn $name:ident ( $( $arg:ident : $ty:ty ),* ) -> $res:ty = $id:ident ; $($rest:tt)* ) => {
@@ -126,7 +117,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_skb_store_bytes(
-        skb: *mut sk_buff,
+        skb: *mut ffi::sk_buff,
         off: u32,
         from: *const c_void,
         len: u32,
@@ -157,7 +148,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_l3_csum_replace(
-        skb: *mut sk_buff,
+        skb: *mut ffi::sk_buff,
         off: u32,
         from: u64,
         to: u64,
@@ -196,7 +187,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_l4_csum_replace(
-        skb: *mut sk_buff,
+        skb: *mut ffi::sk_buff,
         off: u32,
         from: u64,
         to: u64,
@@ -263,7 +254,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_clone_redirect(
-        skb: *mut sk_buff,
+        skb: *mut ffi::sk_buff,
         ifindex: u32,
         flags: u64
     ) -> i32 = bpf_func_id_BPF_FUNC_clone_redirect;
@@ -312,7 +303,7 @@ ebpf_helpers! {
     ///
     /// Return the classid, or 0 for the default unconfigured classid.
     fn bpf_get_cgroup_classid(
-        skb: *mut sk_buff
+        skb: *mut ffi::sk_buff
     ) -> u32 = bpf_func_id_BPF_FUNC_get_cgroup_classid;
 
     /// Push a *vlan_tci* (VLAN tag control information) of protocol
@@ -331,7 +322,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_skb_vlan_push(
-        skb: *mut sk_buff,
+        skb: *mut ffi::sk_buff,
         vlan_proto: be16,
         vlan_tci: u16
     ) -> i32 = bpf_func_id_BPF_FUNC_skb_vlan_push;
@@ -346,7 +337,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_skb_vlan_pop(
-        skb: *mut sk_buff
+        skb: *mut ffi::sk_buff
     ) -> i32 = bpf_func_id_BPF_FUNC_skb_vlan_pop;
 
     /// Get tunnel metadata.
@@ -372,7 +363,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_skb_get_tunnel_key(
-        skb: *mut sk_buff,
+        skb: *mut ffi::sk_buff,
         key: *const c_void,
         size: u32,
         flags: u64
@@ -402,7 +393,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_skb_set_tunnel_key(
-        skb: *mut sk_buff,
+        skb: *mut ffi::sk_buff,
         key: *const ffi::bpf_tunnel_key,
         size: u32,
         flags: u64
@@ -490,7 +481,7 @@ ebpf_helpers! {
     /// Return the realm of the route for the packet associated to *skb*,
     /// or 0 if none was found.
     fn bpf_get_route_realm(
-        skb: *mut sk_buff
+        skb: *mut ffi::sk_buff
     ) -> u32 = bpf_func_id_BPF_FUNC_get_route_realm;
 
     /// Write raw *data* blob into a special BPF perf event held by
@@ -537,7 +528,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_perf_event_output(
-        reg: *mut pt_reg,
+        reg: *mut ffi::pt_reg,
         map: *mut ffi::bpf_map,
         flags: u64,
         data: *mut c_void,
@@ -559,7 +550,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_skb_load_bytes(
-        ctx: *const sk_buff,
+        ctx: *const ffi::sk_buff,
         off: u32,
         to: *mut c_void,
         len: u32
@@ -606,7 +597,7 @@ ebpf_helpers! {
     ///
     /// Return the positive or null stack id on success, or a negative error in case of failure.
     fn bpf_get_stackid(
-        reg: *mut pt_reg,
+        reg: *mut ffi::pt_reg,
         map: *mut ffi::bpf_map,
         flags: u64
     ) -> i32 = bpf_func_id_BPF_FUNC_get_stackid;
@@ -660,7 +651,7 @@ ebpf_helpers! {
     ///
     /// Return the size of the option data retrieved.
     fn bpf_skb_get_tunnel_opt(
-        skb: *mut sk_buff,
+        skb: *mut ffi::sk_buff,
         md: *mut u8,
         size: u32
     ) -> i32 = bpf_func_id_BPF_FUNC_skb_get_tunnel_opt;
@@ -673,7 +664,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_skb_set_tunnel_opt(
-        skb: *mut sk_buff,
+        skb: *mut ffi::sk_buff,
         md: *mut u8,
         size: u32
     ) -> i32 = bpf_func_id_BPF_FUNC_skb_set_tunnel_opt;
@@ -704,7 +695,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_skb_change_proto(
-        skb: *mut sk_buff,
+        skb: *mut ffi::sk_buff,
         proto: be16,
         flags: u64
     ) -> i32 = bpf_func_id_BPF_FUNC_skb_change_proto;
@@ -735,7 +726,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_skb_change_type(
-        skb: *mut sk_buff,
+        skb: *mut ffi::sk_buff,
         ty: u32
     ) -> i32 = bpf_func_id_BPF_FUNC_skb_change_type;
 
@@ -748,7 +739,7 @@ ebpf_helpers! {
     /// - 1, if the *skb* succeeded the cgroup2 descendant test.
     /// - A negative error code, if an error occurred.
     fn bpf_skb_under_cgroup(
-        skb: *mut sk_buff,
+        skb: *mut ffi::sk_buff,
         map: *mut ffi::bpf_map,
         index: u32
     ) -> i32 = bpf_func_id_BPF_FUNC_skb_under_cgroup;
@@ -768,7 +759,7 @@ ebpf_helpers! {
     ///
     /// Return the 32-bit hash.
     fn bpf_get_hash_recalc(
-        skb: *mut sk_buff
+        skb: *mut ffi::sk_buff
     ) -> u32 = bpf_func_id_BPF_FUNC_get_hash_recalc;
 
     /// A pointer to the current task struct.
@@ -837,7 +828,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn pf_skb_change_tail(
-        skb: *mut sk_buff,
+        skb: *mut ffi::sk_buff,
         len: u32,
         flags: u64
     ) -> i32 = bpf_func_id_BPF_FUNC_skb_change_tail;
@@ -878,7 +869,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_skb_pull_data(
-        skb: *mut sk_buff,
+        skb: *mut ffi::sk_buff,
         len: u32
     ) -> i32 = bpf_func_id_BPF_FUNC_skb_pull_data;
 
@@ -893,7 +884,7 @@ ebpf_helpers! {
     ///
     /// Return the checksum on success, or a negative error code in case of failure.
     fn bpf_csum_update(
-        skb: *mut sk_buff,
+        skb: *mut ffi::sk_buff,
         csum: wsum
     ) -> i64 = bpf_func_id_BPF_FUNC_csum_update;
 
@@ -906,7 +897,7 @@ ebpf_helpers! {
     ///
     /// Return the 32-bit hash.
     fn bpf_set_hash_invalid(
-        skb: *mut sk_buff
+        skb: *mut ffi::sk_buff
     ) = bpf_func_id_BPF_FUNC_set_hash_invalid;
 
     /// Return the id of the current NUMA node.
@@ -938,7 +929,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_skb_change_head(
-        skb: *mut sk_buff,
+        skb: *mut ffi::sk_buff,
         len: u32,
         flags: u64
     ) -> i32 = bpf_func_id_BPF_FUNC_skb_change_head;
@@ -956,7 +947,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_xdp_adjust_head(
-        ctx: *mut xdp_buff,
+        ctx: *mut ffi::xdp_buff,
         offset: i32
     ) -> i32 = bpf_func_id_BPF_FUNC_xdp_adjust_head;
 
@@ -1032,14 +1023,14 @@ ebpf_helpers! {
     /// is returned (note that `overflowuid` might also be the actual
     /// UID value for the socket).
     fn bpf_get_socket_uid(
-        skb: *mut sk_buff
+        skb: *mut ffi::sk_buff
     ) -> u32 = bpf_func_id_BPF_FUNC_get_socket_uid;
 
     /// Set the full hash for *skb* (set the field *skb*`->hash`) to value *hash*.
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_set_hash(
-        skb: *mut sk_buff,
+        skb: *mut ffi::sk_buff,
         hash: u32
     ) -> u32 = bpf_func_id_BPF_FUNC_set_hash;
 
@@ -1089,7 +1080,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_skb_adjust_room(
-        skb: *mut sk_buff,
+        skb: *mut ffi::sk_buff,
         len_diff: i32,
         mode: u32,
         flags: u64
@@ -1187,7 +1178,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_xdp_adjust_meta(
-        xdp_md: *mut xdp_buff,
+        xdp_md: *mut ffi::xdp_buff,
         offset: i32
     ) -> i32 = bpf_func_id_BPF_FUNC_xdp_adjust_meta;
 
@@ -1257,7 +1248,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_perf_prog_read_value(
-        ctx: *mut bpf_perf_event_data,
+        ctx: *mut ffi::bpf_perf_event_data,
         buf: *mut ffi::bpf_perf_event_value,
         buf_size: u32
     ) -> i32 = bpf_func_id_BPF_FUNC_perf_prog_read_value;
@@ -1309,7 +1300,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success.
     fn bpf_override_return(
-        reg: *mut pt_reg,
+        reg: *mut ffi::pt_reg,
         rc: u64
     ) -> i32 = bpf_func_id_BPF_FUNC_override_return;
 
@@ -1363,7 +1354,7 @@ ebpf_helpers! {
     ///
     /// Return `SK_PASS` on success, or `SK_DROP` on error.
     fn bpf_msg_redirect_map(
-        msg: *mut sk_msg_buff,
+        msg: *mut ffi::sk_msg_buff,
         map: *mut ffi::bpf_map,
         key: u32,
         flags: u64
@@ -1401,7 +1392,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success.
     fn bpf_msg_apply_bytes(
-        msg: *mut sk_msg_buff,
+        msg: *mut ffi::sk_msg_buff,
         len: u32
     ) -> i32 = bpf_func_id_BPF_FUNC_msg_apply_bytes;
 
@@ -1421,7 +1412,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success.
     fn bpf_msg_cork_bytes(
-        msg: *mut sk_msg_buff,
+        msg: *mut ffi::sk_msg_buff,
         len: u32
     ) -> i32 = bpf_func_id_BPF_FUNC_msg_cork_bytes;
 
@@ -1454,7 +1445,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_msg_pull_data(
-        msg: *mut sk_msg_buff,
+        msg: *mut ffi::sk_msg_buff,
         start: u32,
         end: u32,
         flags: u64
@@ -1495,7 +1486,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_xdp_adjust_tail(
-        xdp_md: *mut xdp_buff,
+        xdp_md: *mut ffi::xdp_buff,
         offset: i32
     ) -> i32 = bpf_func_id_BPF_FUNC_xdp_adjust_tail;
 
@@ -1513,7 +1504,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_skb_get_xfrm_state(
-        skb: *mut sk_buff,
+        skb: *mut ffi::sk_buff,
         index: u32,
         state: *mut ffi::bpf_xfrm_state,
         size: u32,
@@ -1552,7 +1543,7 @@ ebpf_helpers! {
     /// Returna non-negative value equal to or less than *size* on success,
     /// or a negative error in case of failure.
     fn bpf_get_stack(
-        regs: *mut pt_regs,
+        regs: *mut ffi::pt_regs,
         buf: *mut c_void,
         size: u32,
         flags: u64
@@ -1579,7 +1570,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_skb_load_bytes_relative(
-        skb: *mut sk_buff,
+        skb: *mut ffi::sk_buff,
         off: u32,
         to: *mut c_void,
         len: u32,
@@ -1641,7 +1632,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_sock_hash_update(
-        skops: *mut bpf_sock_ops_kern,
+        skops: *mut ffi::bpf_sock_ops_kern,
         map: *mut ffi::bpf_map,
         key: *mut c_void,
         flags: u64
@@ -1660,7 +1651,7 @@ ebpf_helpers! {
     ///
     /// Return `SK_PASS` on success, or `SK_DROP` on error.
     fn bpf_msg_redirect_hash(
-        msg: *mut sk_msg_buff,
+        msg: *mut ffi::sk_msg_buff,
         map: *mut ffi::bpf_map,
         key: *mut c_void,
         flags: u64
@@ -1679,7 +1670,7 @@ ebpf_helpers! {
     ///
     /// Return `SK_PASS` on success, or `SK_DROP` on error.
     fn bpf_sk_redirect_hash(
-        skb: *mut sk_buff,
+        skb: *mut ffi::sk_buff,
         map: *mut ffi::bpf_map,
         key: *mut c_void,
         flags: u64
@@ -1721,7 +1712,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_lwt_push_encap(
-        skb: *mut sk_buff,
+        skb: *mut ffi::sk_buff,
         ty: u32,
         hdr: *mut c_void,
         len: u32
@@ -1742,7 +1733,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_lwt_seg6_store_bytes(
-        skb: *mut sk_buff,
+        skb: *mut ffi::sk_buff,
         offset: u32,
         from: *const c_void,
         len: u32
@@ -1763,7 +1754,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_lwt_seg6_adjust_srh(
-        skb: *mut sk_buff,
+        skb: *mut ffi::sk_buff,
         offset: u32,
         len: u32
     ) -> i32 = bpf_func_id_BPF_FUNC_lwt_seg6_adjust_srh;
@@ -1798,7 +1789,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_lwt_seg6_action(
-        skb: *mut sk_buff,
+        skb: *mut ffi::sk_buff,
         action: u32,
         param: *mut c_void,
         param_len: u32
@@ -1870,7 +1861,7 @@ ebpf_helpers! {
     ///
     /// Return the id is returned or 0 in case the id could not be retrieved.
     fn bpf_skb_cgroup_id(
-        skb: *mut sk_buff
+        skb: *mut ffi::sk_buff
     ) -> u64 = bpf_func_id_BPF_FUNC_skb_cgroup_id;
 
     /// Return a 64-bit integer containing the current cgroup id based
@@ -1905,7 +1896,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_sk_select_reuseport(
-        reuse: *mut sk_reuseport_md,
+        reuse: *mut ffi::sk_reuseport_md,
         map: *mut ffi::bpf_map,
         key: *mut c_void,
         flags: u64
@@ -1928,7 +1919,7 @@ ebpf_helpers! {
     ///
     /// Return the id is returned or 0 in case the id could not be retrieved.
     fn bpf_skb_ancestor_cgroup_id(
-        skb: *mut sk_buff,
+        skb: *mut ffi::sk_buff,
         level: i32
     ) -> u64 = bpf_func_id_BPF_FUNC_skb_ancestor_cgroup_id;
 
@@ -2065,7 +2056,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_msg_push_data(
-        skb: *mut sk_buff,
+        skb: *mut ffi::sk_buff,
         start: u32,
         end: u32,
         flags: u64
@@ -2082,7 +2073,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_msg_pop_data(
-        msg: *mut sk_msg_buff,
+        msg: *mut ffi::sk_msg_buff,
         start: u32,
         cut: u32,
         flags: u64
@@ -2190,7 +2181,7 @@ ebpf_helpers! {
     /// Return 1 if the `CE` flag is set (either by the current helper call
     /// or because it was already present), 0 if it is not set.
     fn bpf_skb_ecn_set_ce(
-        skb: *mut sk_buff
+        skb: *mut ffi::sk_buff
     ) -> i32 = bpf_func_id_BPF_FUNC_skb_ecn_set_ce;
 
     /// Return a `struct bpf_sock` pointer in `TCP_LISTEN` state.
