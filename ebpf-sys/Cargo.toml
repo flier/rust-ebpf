@@ -12,4 +12,7 @@ gen = ["bindgen"]
 cfg-if = "0.1"
 
 [build-dependencies]
+failure = "0.1"
+libc = "0.2"
+
 bindgen = { version = "0.49", optional = true }

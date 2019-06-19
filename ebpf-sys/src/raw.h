@@ -1,3 +1,3 @@
-#include "bpf.h"
-#include "btf.h"
+#include <linux/bpf.h>
+#include <linux/btf.h>
 #include "libbpf.h"

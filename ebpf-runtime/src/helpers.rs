@@ -528,7 +528,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success, or a negative error in case of failure.
     fn bpf_perf_event_output(
-        reg: *mut ffi::pt_reg,
+        regs: *mut ffi::pt_regs,
         map: *mut ffi::bpf_map,
         flags: u64,
         data: *mut c_void,
@@ -597,7 +597,7 @@ ebpf_helpers! {
     ///
     /// Return the positive or null stack id on success, or a negative error in case of failure.
     fn bpf_get_stackid(
-        reg: *mut ffi::pt_reg,
+        regs: *mut ffi::pt_regs,
         map: *mut ffi::bpf_map,
         flags: u64
     ) -> i32 = bpf_func_id_BPF_FUNC_get_stackid;
@@ -1300,7 +1300,7 @@ ebpf_helpers! {
     ///
     /// Return 0 on success.
     fn bpf_override_return(
-        reg: *mut ffi::pt_reg,
+        regs: *mut ffi::pt_regs,
         rc: u64
     ) -> i32 = bpf_func_id_BPF_FUNC_override_return;
 

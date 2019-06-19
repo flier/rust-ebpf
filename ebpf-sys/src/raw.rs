@@ -237,13 +237,11 @@ pub const BPF_DEVCG_ACC_READ: u32 = 2;
 pub const BPF_DEVCG_ACC_WRITE: u32 = 4;
 pub const BPF_DEVCG_DEV_BLOCK: u32 = 1;
 pub const BPF_DEVCG_DEV_CHAR: u32 = 2;
-pub const BPF_LOG_BUF_SIZE: u32 = 16777215;
 pub type __u8 = ::std::os::raw::c_uchar;
 pub type __s16 = ::std::os::raw::c_short;
 pub type __u16 = ::std::os::raw::c_ushort;
 pub type __s32 = ::std::os::raw::c_int;
 pub type __u32 = ::std::os::raw::c_uint;
-pub type __s64 = ::std::os::raw::c_longlong;
 pub type __u64 = ::std::os::raw::c_ulonglong;
 pub type __be16 = __u16;
 pub type __be32 = __u32;
@@ -3104,6 +3102,348 @@ fn bindgen_test_layout_xdp_md() {
         )
     );
 }
+pub const sk_action_SK_DROP: sk_action = 0;
+pub const sk_action_SK_PASS: sk_action = 1;
+pub type sk_action = u32;
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct sk_msg_md {
+    pub __bindgen_anon_1: sk_msg_md__bindgen_ty_1,
+    pub __bindgen_anon_2: sk_msg_md__bindgen_ty_2,
+    pub family: __u32,
+    pub remote_ip4: __u32,
+    pub local_ip4: __u32,
+    pub remote_ip6: [__u32; 4usize],
+    pub local_ip6: [__u32; 4usize],
+    pub remote_port: __u32,
+    pub local_port: __u32,
+    pub size: __u32,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union sk_msg_md__bindgen_ty_1 {
+    pub data: *mut ::std::os::raw::c_void,
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 8usize], u8>,
+    _bindgen_union_align: u64,
+}
+#[test]
+fn bindgen_test_layout_sk_msg_md__bindgen_ty_1() {
+    assert_eq!(
+        ::std::mem::size_of::<sk_msg_md__bindgen_ty_1>(),
+        8usize,
+        concat!("Size of: ", stringify!(sk_msg_md__bindgen_ty_1))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<sk_msg_md__bindgen_ty_1>(),
+        8usize,
+        concat!("Alignment of ", stringify!(sk_msg_md__bindgen_ty_1))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<sk_msg_md__bindgen_ty_1>())).data as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sk_msg_md__bindgen_ty_1),
+            "::",
+            stringify!(data)
+        )
+    );
+}
+impl sk_msg_md__bindgen_ty_1 {
+    #[inline]
+    pub fn new_bitfield_1() -> __BindgenBitfieldUnit<[u8; 8usize], u8> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 8usize], u8> =
+            Default::default();
+        __bindgen_bitfield_unit
+    }
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union sk_msg_md__bindgen_ty_2 {
+    pub data_end: *mut ::std::os::raw::c_void,
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 8usize], u8>,
+    _bindgen_union_align: u64,
+}
+#[test]
+fn bindgen_test_layout_sk_msg_md__bindgen_ty_2() {
+    assert_eq!(
+        ::std::mem::size_of::<sk_msg_md__bindgen_ty_2>(),
+        8usize,
+        concat!("Size of: ", stringify!(sk_msg_md__bindgen_ty_2))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<sk_msg_md__bindgen_ty_2>(),
+        8usize,
+        concat!("Alignment of ", stringify!(sk_msg_md__bindgen_ty_2))
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<sk_msg_md__bindgen_ty_2>())).data_end as *const _ as usize
+        },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sk_msg_md__bindgen_ty_2),
+            "::",
+            stringify!(data_end)
+        )
+    );
+}
+impl sk_msg_md__bindgen_ty_2 {
+    #[inline]
+    pub fn new_bitfield_1() -> __BindgenBitfieldUnit<[u8; 8usize], u8> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 8usize], u8> =
+            Default::default();
+        __bindgen_bitfield_unit
+    }
+}
+#[test]
+fn bindgen_test_layout_sk_msg_md() {
+    assert_eq!(
+        ::std::mem::size_of::<sk_msg_md>(),
+        72usize,
+        concat!("Size of: ", stringify!(sk_msg_md))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<sk_msg_md>(),
+        8usize,
+        concat!("Alignment of ", stringify!(sk_msg_md))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<sk_msg_md>())).family as *const _ as usize },
+        16usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sk_msg_md),
+            "::",
+            stringify!(family)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<sk_msg_md>())).remote_ip4 as *const _ as usize },
+        20usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sk_msg_md),
+            "::",
+            stringify!(remote_ip4)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<sk_msg_md>())).local_ip4 as *const _ as usize },
+        24usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sk_msg_md),
+            "::",
+            stringify!(local_ip4)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<sk_msg_md>())).remote_ip6 as *const _ as usize },
+        28usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sk_msg_md),
+            "::",
+            stringify!(remote_ip6)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<sk_msg_md>())).local_ip6 as *const _ as usize },
+        44usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sk_msg_md),
+            "::",
+            stringify!(local_ip6)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<sk_msg_md>())).remote_port as *const _ as usize },
+        60usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sk_msg_md),
+            "::",
+            stringify!(remote_port)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<sk_msg_md>())).local_port as *const _ as usize },
+        64usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sk_msg_md),
+            "::",
+            stringify!(local_port)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<sk_msg_md>())).size as *const _ as usize },
+        68usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sk_msg_md),
+            "::",
+            stringify!(size)
+        )
+    );
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct sk_reuseport_md {
+    pub __bindgen_anon_1: sk_reuseport_md__bindgen_ty_1,
+    pub __bindgen_anon_2: sk_reuseport_md__bindgen_ty_2,
+    pub len: __u32,
+    pub eth_protocol: __u32,
+    pub ip_protocol: __u32,
+    pub bind_inany: __u32,
+    pub hash: __u32,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union sk_reuseport_md__bindgen_ty_1 {
+    pub data: *mut ::std::os::raw::c_void,
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 8usize], u8>,
+    _bindgen_union_align: u64,
+}
+#[test]
+fn bindgen_test_layout_sk_reuseport_md__bindgen_ty_1() {
+    assert_eq!(
+        ::std::mem::size_of::<sk_reuseport_md__bindgen_ty_1>(),
+        8usize,
+        concat!("Size of: ", stringify!(sk_reuseport_md__bindgen_ty_1))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<sk_reuseport_md__bindgen_ty_1>(),
+        8usize,
+        concat!("Alignment of ", stringify!(sk_reuseport_md__bindgen_ty_1))
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<sk_reuseport_md__bindgen_ty_1>())).data as *const _ as usize
+        },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sk_reuseport_md__bindgen_ty_1),
+            "::",
+            stringify!(data)
+        )
+    );
+}
+impl sk_reuseport_md__bindgen_ty_1 {
+    #[inline]
+    pub fn new_bitfield_1() -> __BindgenBitfieldUnit<[u8; 8usize], u8> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 8usize], u8> =
+            Default::default();
+        __bindgen_bitfield_unit
+    }
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union sk_reuseport_md__bindgen_ty_2 {
+    pub data_end: *mut ::std::os::raw::c_void,
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 8usize], u8>,
+    _bindgen_union_align: u64,
+}
+#[test]
+fn bindgen_test_layout_sk_reuseport_md__bindgen_ty_2() {
+    assert_eq!(
+        ::std::mem::size_of::<sk_reuseport_md__bindgen_ty_2>(),
+        8usize,
+        concat!("Size of: ", stringify!(sk_reuseport_md__bindgen_ty_2))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<sk_reuseport_md__bindgen_ty_2>(),
+        8usize,
+        concat!("Alignment of ", stringify!(sk_reuseport_md__bindgen_ty_2))
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::std::ptr::null::<sk_reuseport_md__bindgen_ty_2>())).data_end as *const _ as usize
+        },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sk_reuseport_md__bindgen_ty_2),
+            "::",
+            stringify!(data_end)
+        )
+    );
+}
+impl sk_reuseport_md__bindgen_ty_2 {
+    #[inline]
+    pub fn new_bitfield_1() -> __BindgenBitfieldUnit<[u8; 8usize], u8> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 8usize], u8> =
+            Default::default();
+        __bindgen_bitfield_unit
+    }
+}
+#[test]
+fn bindgen_test_layout_sk_reuseport_md() {
+    assert_eq!(
+        ::std::mem::size_of::<sk_reuseport_md>(),
+        40usize,
+        concat!("Size of: ", stringify!(sk_reuseport_md))
+    );
+    assert_eq!(
+        ::std::mem::align_of::<sk_reuseport_md>(),
+        8usize,
+        concat!("Alignment of ", stringify!(sk_reuseport_md))
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<sk_reuseport_md>())).len as *const _ as usize },
+        16usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sk_reuseport_md),
+            "::",
+            stringify!(len)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<sk_reuseport_md>())).eth_protocol as *const _ as usize },
+        20usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sk_reuseport_md),
+            "::",
+            stringify!(eth_protocol)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<sk_reuseport_md>())).ip_protocol as *const _ as usize },
+        24usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sk_reuseport_md),
+            "::",
+            stringify!(ip_protocol)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<sk_reuseport_md>())).bind_inany as *const _ as usize },
+        28usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sk_reuseport_md),
+            "::",
+            stringify!(bind_inany)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<sk_reuseport_md>())).hash as *const _ as usize },
+        32usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sk_reuseport_md),
+            "::",
+            stringify!(hash)
+        )
+    );
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct bpf_prog_info {
@@ -5166,996 +5506,7 @@ fn bindgen_test_layout_bpf_sysctl() {
         )
     );
 }
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct bpf_create_map_attr {
-    pub name: *const ::std::os::raw::c_char,
-    pub map_type: bpf_map_type,
-    pub map_flags: __u32,
-    pub key_size: __u32,
-    pub value_size: __u32,
-    pub max_entries: __u32,
-    pub numa_node: __u32,
-    pub btf_fd: __u32,
-    pub btf_key_type_id: __u32,
-    pub btf_value_type_id: __u32,
-    pub map_ifindex: __u32,
-    pub inner_map_fd: __u32,
-}
-#[test]
-fn bindgen_test_layout_bpf_create_map_attr() {
-    assert_eq!(
-        ::std::mem::size_of::<bpf_create_map_attr>(),
-        56usize,
-        concat!("Size of: ", stringify!(bpf_create_map_attr))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<bpf_create_map_attr>(),
-        8usize,
-        concat!("Alignment of ", stringify!(bpf_create_map_attr))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<bpf_create_map_attr>())).name as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_create_map_attr),
-            "::",
-            stringify!(name)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<bpf_create_map_attr>())).map_type as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_create_map_attr),
-            "::",
-            stringify!(map_type)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<bpf_create_map_attr>())).map_flags as *const _ as usize },
-        12usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_create_map_attr),
-            "::",
-            stringify!(map_flags)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<bpf_create_map_attr>())).key_size as *const _ as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_create_map_attr),
-            "::",
-            stringify!(key_size)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<bpf_create_map_attr>())).value_size as *const _ as usize },
-        20usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_create_map_attr),
-            "::",
-            stringify!(value_size)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<bpf_create_map_attr>())).max_entries as *const _ as usize },
-        24usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_create_map_attr),
-            "::",
-            stringify!(max_entries)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<bpf_create_map_attr>())).numa_node as *const _ as usize },
-        28usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_create_map_attr),
-            "::",
-            stringify!(numa_node)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<bpf_create_map_attr>())).btf_fd as *const _ as usize },
-        32usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_create_map_attr),
-            "::",
-            stringify!(btf_fd)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<bpf_create_map_attr>())).btf_key_type_id as *const _ as usize
-        },
-        36usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_create_map_attr),
-            "::",
-            stringify!(btf_key_type_id)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<bpf_create_map_attr>())).btf_value_type_id as *const _ as usize
-        },
-        40usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_create_map_attr),
-            "::",
-            stringify!(btf_value_type_id)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<bpf_create_map_attr>())).map_ifindex as *const _ as usize },
-        44usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_create_map_attr),
-            "::",
-            stringify!(map_ifindex)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<bpf_create_map_attr>())).inner_map_fd as *const _ as usize
-        },
-        48usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_create_map_attr),
-            "::",
-            stringify!(inner_map_fd)
-        )
-    );
-}
-extern "C" {
-    pub fn bpf_create_map_xattr(create_attr: *const bpf_create_map_attr) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_create_map_node(
-        map_type: bpf_map_type,
-        name: *const ::std::os::raw::c_char,
-        key_size: ::std::os::raw::c_int,
-        value_size: ::std::os::raw::c_int,
-        max_entries: ::std::os::raw::c_int,
-        map_flags: __u32,
-        node: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_create_map_name(
-        map_type: bpf_map_type,
-        name: *const ::std::os::raw::c_char,
-        key_size: ::std::os::raw::c_int,
-        value_size: ::std::os::raw::c_int,
-        max_entries: ::std::os::raw::c_int,
-        map_flags: __u32,
-    ) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_create_map(
-        map_type: bpf_map_type,
-        key_size: ::std::os::raw::c_int,
-        value_size: ::std::os::raw::c_int,
-        max_entries: ::std::os::raw::c_int,
-        map_flags: __u32,
-    ) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_create_map_in_map_node(
-        map_type: bpf_map_type,
-        name: *const ::std::os::raw::c_char,
-        key_size: ::std::os::raw::c_int,
-        inner_map_fd: ::std::os::raw::c_int,
-        max_entries: ::std::os::raw::c_int,
-        map_flags: __u32,
-        node: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_create_map_in_map(
-        map_type: bpf_map_type,
-        name: *const ::std::os::raw::c_char,
-        key_size: ::std::os::raw::c_int,
-        inner_map_fd: ::std::os::raw::c_int,
-        max_entries: ::std::os::raw::c_int,
-        map_flags: __u32,
-    ) -> ::std::os::raw::c_int;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct bpf_load_program_attr {
-    pub prog_type: bpf_prog_type,
-    pub expected_attach_type: bpf_attach_type,
-    pub name: *const ::std::os::raw::c_char,
-    pub insns: *const bpf_insn,
-    pub insns_cnt: usize,
-    pub license: *const ::std::os::raw::c_char,
-    pub kern_version: __u32,
-    pub prog_ifindex: __u32,
-    pub prog_btf_fd: __u32,
-    pub func_info_rec_size: __u32,
-    pub func_info: *const ::std::os::raw::c_void,
-    pub func_info_cnt: __u32,
-    pub line_info_rec_size: __u32,
-    pub line_info: *const ::std::os::raw::c_void,
-    pub line_info_cnt: __u32,
-    pub log_level: __u32,
-    pub prog_flags: __u32,
-}
-#[test]
-fn bindgen_test_layout_bpf_load_program_attr() {
-    assert_eq!(
-        ::std::mem::size_of::<bpf_load_program_attr>(),
-        96usize,
-        concat!("Size of: ", stringify!(bpf_load_program_attr))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<bpf_load_program_attr>(),
-        8usize,
-        concat!("Alignment of ", stringify!(bpf_load_program_attr))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<bpf_load_program_attr>())).prog_type as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_load_program_attr),
-            "::",
-            stringify!(prog_type)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<bpf_load_program_attr>())).expected_attach_type as *const _
-                as usize
-        },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_load_program_attr),
-            "::",
-            stringify!(expected_attach_type)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<bpf_load_program_attr>())).name as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_load_program_attr),
-            "::",
-            stringify!(name)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<bpf_load_program_attr>())).insns as *const _ as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_load_program_attr),
-            "::",
-            stringify!(insns)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<bpf_load_program_attr>())).insns_cnt as *const _ as usize },
-        24usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_load_program_attr),
-            "::",
-            stringify!(insns_cnt)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<bpf_load_program_attr>())).license as *const _ as usize },
-        32usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_load_program_attr),
-            "::",
-            stringify!(license)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<bpf_load_program_attr>())).kern_version as *const _ as usize
-        },
-        40usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_load_program_attr),
-            "::",
-            stringify!(kern_version)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<bpf_load_program_attr>())).prog_ifindex as *const _ as usize
-        },
-        44usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_load_program_attr),
-            "::",
-            stringify!(prog_ifindex)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<bpf_load_program_attr>())).prog_btf_fd as *const _ as usize
-        },
-        48usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_load_program_attr),
-            "::",
-            stringify!(prog_btf_fd)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<bpf_load_program_attr>())).func_info_rec_size as *const _
-                as usize
-        },
-        52usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_load_program_attr),
-            "::",
-            stringify!(func_info_rec_size)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<bpf_load_program_attr>())).func_info as *const _ as usize },
-        56usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_load_program_attr),
-            "::",
-            stringify!(func_info)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<bpf_load_program_attr>())).func_info_cnt as *const _ as usize
-        },
-        64usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_load_program_attr),
-            "::",
-            stringify!(func_info_cnt)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<bpf_load_program_attr>())).line_info_rec_size as *const _
-                as usize
-        },
-        68usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_load_program_attr),
-            "::",
-            stringify!(line_info_rec_size)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<bpf_load_program_attr>())).line_info as *const _ as usize },
-        72usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_load_program_attr),
-            "::",
-            stringify!(line_info)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<bpf_load_program_attr>())).line_info_cnt as *const _ as usize
-        },
-        80usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_load_program_attr),
-            "::",
-            stringify!(line_info_cnt)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<bpf_load_program_attr>())).log_level as *const _ as usize },
-        84usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_load_program_attr),
-            "::",
-            stringify!(log_level)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<bpf_load_program_attr>())).prog_flags as *const _ as usize
-        },
-        88usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_load_program_attr),
-            "::",
-            stringify!(prog_flags)
-        )
-    );
-}
-extern "C" {
-    pub fn bpf_load_program_xattr(
-        load_attr: *const bpf_load_program_attr,
-        log_buf: *mut ::std::os::raw::c_char,
-        log_buf_sz: usize,
-    ) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_load_program(
-        type_: bpf_prog_type,
-        insns: *const bpf_insn,
-        insns_cnt: usize,
-        license: *const ::std::os::raw::c_char,
-        kern_version: __u32,
-        log_buf: *mut ::std::os::raw::c_char,
-        log_buf_sz: usize,
-    ) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_verify_program(
-        type_: bpf_prog_type,
-        insns: *const bpf_insn,
-        insns_cnt: usize,
-        prog_flags: __u32,
-        license: *const ::std::os::raw::c_char,
-        kern_version: __u32,
-        log_buf: *mut ::std::os::raw::c_char,
-        log_buf_sz: usize,
-        log_level: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_map_update_elem(
-        fd: ::std::os::raw::c_int,
-        key: *const ::std::os::raw::c_void,
-        value: *const ::std::os::raw::c_void,
-        flags: __u64,
-    ) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_map_lookup_elem(
-        fd: ::std::os::raw::c_int,
-        key: *const ::std::os::raw::c_void,
-        value: *mut ::std::os::raw::c_void,
-    ) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_map_lookup_elem_flags(
-        fd: ::std::os::raw::c_int,
-        key: *const ::std::os::raw::c_void,
-        value: *mut ::std::os::raw::c_void,
-        flags: __u64,
-    ) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_map_lookup_and_delete_elem(
-        fd: ::std::os::raw::c_int,
-        key: *const ::std::os::raw::c_void,
-        value: *mut ::std::os::raw::c_void,
-    ) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_map_delete_elem(
-        fd: ::std::os::raw::c_int,
-        key: *const ::std::os::raw::c_void,
-    ) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_map_get_next_key(
-        fd: ::std::os::raw::c_int,
-        key: *const ::std::os::raw::c_void,
-        next_key: *mut ::std::os::raw::c_void,
-    ) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_map_freeze(fd: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_obj_pin(
-        fd: ::std::os::raw::c_int,
-        pathname: *const ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_obj_get(pathname: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_prog_attach(
-        prog_fd: ::std::os::raw::c_int,
-        attachable_fd: ::std::os::raw::c_int,
-        type_: bpf_attach_type,
-        flags: ::std::os::raw::c_uint,
-    ) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_prog_detach(
-        attachable_fd: ::std::os::raw::c_int,
-        type_: bpf_attach_type,
-    ) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_prog_detach2(
-        prog_fd: ::std::os::raw::c_int,
-        attachable_fd: ::std::os::raw::c_int,
-        type_: bpf_attach_type,
-    ) -> ::std::os::raw::c_int;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct bpf_prog_test_run_attr {
-    pub prog_fd: ::std::os::raw::c_int,
-    pub repeat: ::std::os::raw::c_int,
-    pub data_in: *const ::std::os::raw::c_void,
-    pub data_size_in: __u32,
-    pub data_out: *mut ::std::os::raw::c_void,
-    pub data_size_out: __u32,
-    pub retval: __u32,
-    pub duration: __u32,
-    pub ctx_in: *const ::std::os::raw::c_void,
-    pub ctx_size_in: __u32,
-    pub ctx_out: *mut ::std::os::raw::c_void,
-    pub ctx_size_out: __u32,
-}
-#[test]
-fn bindgen_test_layout_bpf_prog_test_run_attr() {
-    assert_eq!(
-        ::std::mem::size_of::<bpf_prog_test_run_attr>(),
-        80usize,
-        concat!("Size of: ", stringify!(bpf_prog_test_run_attr))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<bpf_prog_test_run_attr>(),
-        8usize,
-        concat!("Alignment of ", stringify!(bpf_prog_test_run_attr))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<bpf_prog_test_run_attr>())).prog_fd as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_prog_test_run_attr),
-            "::",
-            stringify!(prog_fd)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<bpf_prog_test_run_attr>())).repeat as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_prog_test_run_attr),
-            "::",
-            stringify!(repeat)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<bpf_prog_test_run_attr>())).data_in as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_prog_test_run_attr),
-            "::",
-            stringify!(data_in)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<bpf_prog_test_run_attr>())).data_size_in as *const _ as usize
-        },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_prog_test_run_attr),
-            "::",
-            stringify!(data_size_in)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<bpf_prog_test_run_attr>())).data_out as *const _ as usize },
-        24usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_prog_test_run_attr),
-            "::",
-            stringify!(data_out)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<bpf_prog_test_run_attr>())).data_size_out as *const _ as usize
-        },
-        32usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_prog_test_run_attr),
-            "::",
-            stringify!(data_size_out)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<bpf_prog_test_run_attr>())).retval as *const _ as usize },
-        36usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_prog_test_run_attr),
-            "::",
-            stringify!(retval)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<bpf_prog_test_run_attr>())).duration as *const _ as usize },
-        40usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_prog_test_run_attr),
-            "::",
-            stringify!(duration)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<bpf_prog_test_run_attr>())).ctx_in as *const _ as usize },
-        48usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_prog_test_run_attr),
-            "::",
-            stringify!(ctx_in)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<bpf_prog_test_run_attr>())).ctx_size_in as *const _ as usize
-        },
-        56usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_prog_test_run_attr),
-            "::",
-            stringify!(ctx_size_in)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<bpf_prog_test_run_attr>())).ctx_out as *const _ as usize },
-        64usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_prog_test_run_attr),
-            "::",
-            stringify!(ctx_out)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<bpf_prog_test_run_attr>())).ctx_size_out as *const _ as usize
-        },
-        72usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(bpf_prog_test_run_attr),
-            "::",
-            stringify!(ctx_size_out)
-        )
-    );
-}
-extern "C" {
-    pub fn bpf_prog_test_run_xattr(test_attr: *mut bpf_prog_test_run_attr)
-        -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_prog_test_run(
-        prog_fd: ::std::os::raw::c_int,
-        repeat: ::std::os::raw::c_int,
-        data: *mut ::std::os::raw::c_void,
-        size: __u32,
-        data_out: *mut ::std::os::raw::c_void,
-        size_out: *mut __u32,
-        retval: *mut __u32,
-        duration: *mut __u32,
-    ) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_prog_get_next_id(start_id: __u32, next_id: *mut __u32) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_map_get_next_id(start_id: __u32, next_id: *mut __u32) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_prog_get_fd_by_id(id: __u32) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_map_get_fd_by_id(id: __u32) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_btf_get_fd_by_id(id: __u32) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_obj_get_info_by_fd(
-        prog_fd: ::std::os::raw::c_int,
-        info: *mut ::std::os::raw::c_void,
-        info_len: *mut __u32,
-    ) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_prog_query(
-        target_fd: ::std::os::raw::c_int,
-        type_: bpf_attach_type,
-        query_flags: __u32,
-        attach_flags: *mut __u32,
-        prog_ids: *mut __u32,
-        prog_cnt: *mut __u32,
-    ) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_raw_tracepoint_open(
-        name: *const ::std::os::raw::c_char,
-        prog_fd: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_load_btf(
-        btf: *mut ::std::os::raw::c_void,
-        btf_size: __u32,
-        log_buf: *mut ::std::os::raw::c_char,
-        log_buf_size: __u32,
-        do_log: bool,
-    ) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn bpf_task_fd_query(
-        pid: ::std::os::raw::c_int,
-        fd: ::std::os::raw::c_int,
-        flags: __u32,
-        buf: *mut ::std::os::raw::c_char,
-        buf_len: *mut __u32,
-        prog_id: *mut __u32,
-        fd_type: *mut __u32,
-        probe_offset: *mut __u64,
-        probe_addr: *mut __u64,
-    ) -> ::std::os::raw::c_int;
-}
 pub type va_list = __builtin_va_list;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct btf {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct btf_ext {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct btf_type {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct bpf_object {
-    _unused: [u8; 0],
-}
-extern "C" {
-    pub fn btf__free(btf: *mut btf);
-}
-extern "C" {
-    pub fn btf__new(data: *mut __u8, size: __u32) -> *mut btf;
-}
-extern "C" {
-    pub fn btf__parse_elf(
-        path: *const ::std::os::raw::c_char,
-        btf_ext: *mut *mut btf_ext,
-    ) -> *mut btf;
-}
-extern "C" {
-    pub fn btf__finalize_data(obj: *mut bpf_object, btf: *mut btf) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn btf__load(btf: *mut btf) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn btf__find_by_name(btf: *const btf, type_name: *const ::std::os::raw::c_char) -> __s32;
-}
-extern "C" {
-    pub fn btf__get_nr_types(btf: *const btf) -> __u32;
-}
-extern "C" {
-    pub fn btf__type_by_id(btf: *const btf, id: __u32) -> *const btf_type;
-}
-extern "C" {
-    pub fn btf__resolve_size(btf: *const btf, type_id: __u32) -> __s64;
-}
-extern "C" {
-    pub fn btf__resolve_type(btf: *const btf, type_id: __u32) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn btf__fd(btf: *const btf) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn btf__get_raw_data(btf: *const btf, size: *mut __u32) -> *const ::std::os::raw::c_void;
-}
-extern "C" {
-    pub fn btf__name_by_offset(btf: *const btf, offset: __u32) -> *const ::std::os::raw::c_char;
-}
-extern "C" {
-    pub fn btf__get_from_id(id: __u32, btf: *mut *mut btf) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn btf__get_map_kv_tids(
-        btf: *const btf,
-        map_name: *const ::std::os::raw::c_char,
-        expected_key_size: __u32,
-        expected_value_size: __u32,
-        key_type_id: *mut __u32,
-        value_type_id: *mut __u32,
-    ) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn btf_ext__new(data: *mut __u8, size: __u32) -> *mut btf_ext;
-}
-extern "C" {
-    pub fn btf_ext__free(btf_ext: *mut btf_ext);
-}
-extern "C" {
-    pub fn btf_ext__get_raw_data(
-        btf_ext: *const btf_ext,
-        size: *mut __u32,
-    ) -> *const ::std::os::raw::c_void;
-}
-extern "C" {
-    pub fn btf_ext__reloc_func_info(
-        btf: *const btf,
-        btf_ext: *const btf_ext,
-        sec_name: *const ::std::os::raw::c_char,
-        insns_cnt: __u32,
-        func_info: *mut *mut ::std::os::raw::c_void,
-        cnt: *mut __u32,
-    ) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn btf_ext__reloc_line_info(
-        btf: *const btf,
-        btf_ext: *const btf_ext,
-        sec_name: *const ::std::os::raw::c_char,
-        insns_cnt: __u32,
-        line_info: *mut *mut ::std::os::raw::c_void,
-        cnt: *mut __u32,
-    ) -> ::std::os::raw::c_int;
-}
-extern "C" {
-    pub fn btf_ext__func_info_rec_size(btf_ext: *const btf_ext) -> __u32;
-}
-extern "C" {
-    pub fn btf_ext__line_info_rec_size(btf_ext: *const btf_ext) -> __u32;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct btf_dedup_opts {
-    pub dedup_table_size: ::std::os::raw::c_uint,
-    pub dont_resolve_fwds: bool,
-}
-#[test]
-fn bindgen_test_layout_btf_dedup_opts() {
-    assert_eq!(
-        ::std::mem::size_of::<btf_dedup_opts>(),
-        8usize,
-        concat!("Size of: ", stringify!(btf_dedup_opts))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<btf_dedup_opts>(),
-        4usize,
-        concat!("Alignment of ", stringify!(btf_dedup_opts))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<btf_dedup_opts>())).dedup_table_size as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(btf_dedup_opts),
-            "::",
-            stringify!(dedup_table_size)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<btf_dedup_opts>())).dont_resolve_fwds as *const _ as usize
-        },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(btf_dedup_opts),
-            "::",
-            stringify!(dont_resolve_fwds)
-        )
-    );
-}
-extern "C" {
-    pub fn btf__dedup(
-        btf: *mut btf,
-        btf_ext: *mut btf_ext,
-        opts: *const btf_dedup_opts,
-    ) -> ::std::os::raw::c_int;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct btf_dump {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct btf_dump_opts {
-    pub ctx: *mut ::std::os::raw::c_void,
-}
-#[test]
-fn bindgen_test_layout_btf_dump_opts() {
-    assert_eq!(
-        ::std::mem::size_of::<btf_dump_opts>(),
-        8usize,
-        concat!("Size of: ", stringify!(btf_dump_opts))
-    );
-    assert_eq!(
-        ::std::mem::align_of::<btf_dump_opts>(),
-        8usize,
-        concat!("Alignment of ", stringify!(btf_dump_opts))
-    );
-    assert_eq!(
-        unsafe { &(*(::std::ptr::null::<btf_dump_opts>())).ctx as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(btf_dump_opts),
-            "::",
-            stringify!(ctx)
-        )
-    );
-}
-pub type btf_dump_printf_fn_t = ::std::option::Option<
-    unsafe extern "C" fn(
-        ctx: *mut ::std::os::raw::c_void,
-        fmt: *const ::std::os::raw::c_char,
-        args: *mut __va_list_tag,
-    ),
->;
-extern "C" {
-    pub fn btf_dump__new(
-        btf: *const btf,
-        btf_ext: *const btf_ext,
-        opts: *const btf_dump_opts,
-        printf_fn: btf_dump_printf_fn_t,
-    ) -> *mut btf_dump;
-}
-extern "C" {
-    pub fn btf_dump__free(d: *mut btf_dump);
-}
-extern "C" {
-    pub fn btf_dump__dump_type(d: *mut btf_dump, id: __u32) -> ::std::os::raw::c_int;
-}
 pub const libbpf_errno___LIBBPF_ERRNO__START: libbpf_errno = 4000;
 pub const libbpf_errno_LIBBPF_ERRNO__LIBELF: libbpf_errno = 4000;
 pub const libbpf_errno_LIBBPF_ERRNO__FORMAT: libbpf_errno = 4001;
@@ -6184,6 +5535,11 @@ pub type libbpf_print_fn_t = ::std::option::Option<
         ap: *mut __va_list_tag,
     ) -> ::std::os::raw::c_int,
 >;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct bpf_object {
+    _unused: [u8; 0],
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct bpf_object_open_attr {
@@ -6336,6 +5692,11 @@ extern "C" {
 }
 extern "C" {
     pub fn bpf_object__kversion(obj: *mut bpf_object) -> ::std::os::raw::c_uint;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct btf {
+    _unused: [u8; 0],
 }
 extern "C" {
     pub fn bpf_object__btf(obj: *mut bpf_object) -> *mut btf;

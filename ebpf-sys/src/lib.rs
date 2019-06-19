@@ -13,9 +13,23 @@ cfg_if! {
     if #[cfg(feature = "gen")] {
         include!(concat!(env!("OUT_DIR"), "/raw.rs"));
     } else {
-        include!("raw.rs");
+        mod raw;
+
+        pub use raw::*;
     }
 }
+
+cfg_if! {
+    if #[cfg(all(feature = "gen", target_os = "linux"))] {
+        pub mod kernel {
+            include!(concat!(env!("OUT_DIR"), "/kernel.rs"));
+        }
+    } else {
+        pub mod kernel;
+    }
+}
+
+pub use kernel::{bpf_perf_event_data, pt_regs, sk_buff};
 
 macro_rules! BIT {
     ($shift:expr) => {
