@@ -11,8 +11,6 @@ pub mod ffi {
     pub use ebpf_sys::*;
 
     pub type sk_msg_buff = ();
-    pub type xdp_buff = ();
-    pub type bpf_sock_ops_kern = ();
 }
 
 pub type be16 = u16;

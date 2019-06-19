@@ -90,8 +90,8 @@ fn generate_binding_file() -> Result<(), Error> {
                 format!("-I{}", build_dir.join("include").to_string_lossy()),
                 format!("-I{}", build_dir.join("include/generated").to_string_lossy()),
             ])
-            .whitelist_var("(bpf|sk|xdp|pt)_.*")
-            .whitelist_type("(bpf|sk|xdp|pt)_.*")
+            .whitelist_type("(bpf_sock_ops_kern|bpf_perf_event_data|sk_buff|xdp_buff|pt_regs)")
+            .opaque_type("sk_buff|sock")
             .ignore_functions()
             .generate()
             .map_err(|_| err_msg("generate kernel bindings"))?
