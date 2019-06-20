@@ -5,7 +5,7 @@ use std::env;
 use std::fs::File;
 use std::io::{self, prelude::*};
 use std::path::{Path, PathBuf};
-use std::process::Command;
+use std::process::{Command, Output};
 
 use ebpf_sys::BPF_MAXINSNS;
 use failure::{err_msg, format_err, Error, ResultExt};
@@ -225,10 +225,10 @@ impl Builder {
             _ => extract_extern_crate(&kernel_file)?,
         });
 
-        for pkgid in deps {
+        for dep in deps {
             rustc
                 .arg("--extern")
-                .arg(find_rlib(&deps_dir, &pkgid.replace("-", "_"))?);
+                .arg(find_rlib(&deps_dir, &dep.replace("-", "_"))?);
         }
 
         rustc.run().context("compile eBPF kernel")?;
@@ -270,12 +270,15 @@ impl Builder {
     }
 }
 
-fn extract_build_dependencies(manifest_file: &Path) -> Result<Vec<String>, Error> {
-    let mut file = File::open(manifest_file)?;
+fn read_file(filename: &Path) -> Result<String, Error> {
+    let mut file = File::open(filename)?;
     let mut content = String::new();
     file.read_to_string(&mut content)?;
+    Ok(content)
+}
 
-    match content.parse()? {
+fn extract_build_dependencies(manifest_file: &Path) -> Result<Vec<String>, Error> {
+    match read_file(manifest_file)?.parse()? {
         toml::Value::Table(manifest) => {
             if let Some(toml::Value::Table(deps)) = manifest.get("build-dependencies") {
                 Ok(deps.keys().cloned().collect())
@@ -288,10 +291,7 @@ fn extract_build_dependencies(manifest_file: &Path) -> Result<Vec<String>, Error
 }
 
 fn extract_extern_crate(kernel_file: &Path) -> Result<Vec<String>, Error> {
-    let mut file = File::open(kernel_file)?;
-    let mut content = String::new();
-    file.read_to_string(&mut content)?;
-    let file = syn::parse_file(&content)?;
+    let file = syn::parse_file(&read_file(kernel_file)?)?;
 
     Ok(file
         .items
@@ -332,10 +332,10 @@ trait Runable {
 }
 
 impl Runable for Command {
-    type Output = ();
+    type Output = Output;
     type Error = Error;
 
-    fn run(&mut self) -> Result<(), Error> {
+    fn run(&mut self) -> Result<Self::Output, Error> {
         debug!("run: {:?}", self);
 
         let output = self.output()?;
@@ -345,7 +345,7 @@ impl Runable for Command {
                 debug!("STDOUT: {}", String::from_utf8_lossy(&output.stdout));
             }
 
-            Ok(())
+            Ok(output)
         } else {
             debug!("status: {}", output.status);
 

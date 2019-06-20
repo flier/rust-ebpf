@@ -1,8 +1,8 @@
 #[macro_use]
 extern crate log;
+extern crate ebpf_build;
 extern crate failure;
 extern crate pretty_env_logger;
-extern crate ebpf_build;
 
 use failure::Error;
 

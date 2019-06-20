@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate log;
-extern crate failure;
 extern crate ebpf_loader;
+extern crate failure;
 
 use failure::Error;
 
