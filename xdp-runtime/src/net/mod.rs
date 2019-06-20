@@ -4,18 +4,15 @@ pub mod ipv6;
 pub mod sock;
 
 use core::mem;
+use core::ptr::NonNull;
 
-use untrusted::{EndOfInput, Reader};
+use crate::untrusted::{EndOfInput, Reader};
 
 pub trait Readable: Sized {
     #[inline]
-    fn read<'a, 'b>(reader: &'a mut Reader) -> Result<&'b Self, EndOfInput> {
+    fn read<'a, 'b>(reader: &'a mut Reader) -> Result<NonNull<Self>, EndOfInput> {
         let input = reader.read_bytes(mem::size_of::<Self>())?;
 
-        unsafe {
-            (input.as_slice_less_safe().as_ptr() as *const Self)
-                .as_ref()
-                .ok_or(EndOfInput)
-        }
+        Ok(unsafe { NonNull::new_unchecked(input.as_slice_less_safe().as_ptr() as *mut _) })
     }
 }

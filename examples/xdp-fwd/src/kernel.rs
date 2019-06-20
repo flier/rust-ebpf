@@ -1,13 +1,21 @@
+#![no_std]
+
 extern crate untrusted;
 #[macro_use]
 extern crate ebpf_runtime;
 extern crate xdp_runtime;
 
-use std::mem;
+use core::ptr::NonNull;
 
-use ebpf_runtime::{ffi, bpf_fib_lookup};
-use untrusted::{EndOfInput, Reader};
-use xdp_runtime::{Action, Metadata, net::{ether, ipv4, ipv6, sock, Readable}};
+use ebpf_runtime::{
+    sum16,
+    kernel::fib,
+    EbpfError::{self, *},
+};
+use xdp_runtime::{
+    net::{ether, ipv4, ipv6, sock, Readable},
+    Action, Metadata, redirect_map,
+};
 
 license! { "GPL" }
 version! { 0xFFFFFFFE }
@@ -17,15 +25,15 @@ map! {
 
 #[program(name = "xdp_fwd")]
 pub unsafe extern "C" fn xdp_fwd_prog(md: &Metadata) -> Action {
-    xdp_fwd_flags(md, 0)
+    xdp_fwd_flags(md, fib::Lookup::empty())
 }
 
 #[program(name = "xdp_fwd_direct")]
 pub unsafe extern "C" fn xdp_fwd_direct_prog(md: &Metadata) -> Action {
-    xdp_fwd_flags(md, ffi::BPF_FIB_LOOKUP_DIRECT)
+    xdp_fwd_flags(md, fib::Lookup::DIRECT)
 }
 
-fn xdp_fwd_flags(md: &Metadata, flags: u32) -> Action {
+fn xdp_fwd_flags(md: &Metadata, flags: fib::Lookup) -> Action {
     md.input()
         .ok_or(Action::Drop)
         .and_then(|input| {
@@ -36,37 +44,73 @@ fn xdp_fwd_flags(md: &Metadata, flags: u32) -> Action {
         .unwrap_or(Action::Drop)
 }
 
-fn read_packet(md: &Metadata, r: &mut Reader, flags: u32) -> Result<Action, EndOfInput> {
-    let mut fib_params: ffi::bpf_fib_lookup = unsafe { mem::zeroed() };
-    let eth = ether::Header::read(r)?;
+enum Packet {
+    Ipv4(NonNull<ipv4::Header>),
+    Ipv6(NonNull<ipv6::Header>),
+}
 
-    match eth.proto() {
+fn read_packet(md: &Metadata, r: &mut untrusted::Reader, flags: fib::Lookup) -> Result<Action, EbpfError> {
+    let mut fib_params = fib::Params::default();
+    let mut eth = ether::Header::read(r)?;
+
+    let packet = match unsafe { eth.as_ref().proto() } {
         ether::ETH_P_IP => {
-            let iph = ipv4::Header::read(r)?;
+            let hdr = ipv4::Header::read(r).map_err(|_| EndOfInput)?;
+            let iph = unsafe { hdr.as_ref() };
 
             fib_params.family = sock::AF_INET;
-            fib_params.__bindgen_anon_1.tos = iph.tos;
+            fib_params.with_tos(iph.tos);
             fib_params.l4_protocol = iph.protocol;
             fib_params.tot_len = iph.total_len();
-            fib_params.__bindgen_anon_2.ipv4_src = iph.saddr.into();
-            fib_params.__bindgen_anon_3.ipv4_dst = iph.daddr.into();
+            fib_params.with_ipv4_src(iph.saddr);
+            fib_params.with_ipv4_dst(iph.daddr);
+
+            Packet::Ipv4(hdr)
         }
         ether::ETH_P_IPV6 => {
-            let ip6h = ipv6::Header::read(r)?;
+            let hdr = ipv6::Header::read(r).map_err(|_| EndOfInput)?;;
+            let ip6h = unsafe { hdr.as_ref() };
 
-            fib_params.family= sock::AF_INET6;
-            fib_params.__bindgen_anon_1.flowinfo = ip6h.flowinfo();
+            fib_params.family = sock::AF_INET6;
+            fib_params.with_flowinfo(ip6h.flowinfo());
             fib_params.l4_protocol = ip6h.nexthdr;
             fib_params.tot_len = ip6h.payload_len();
-            fib_params.__bindgen_anon_2.ipv6_src = ip6h.saddr.into();
-            fib_params.__bindgen_anon_3.ipv6_dst = ip6h.daddr.into();
+            fib_params.with_ipv6_src(ip6h.saddr);
+            fib_params.with_ipv6_dst(ip6h.daddr);
+
+            Packet::Ipv6(hdr)
         }
-        _ => {}
-    }
+        _ => {
+            return Ok(Action::Pass);
+        }
+    };
 
     fib_params.ifindex = md.ingress_ifindex;
 
-    let rc = bpf_fib_lookup(md.as_ptr() as *const _, &fib_params, mem::size_of::<ffi::bpf_fib_lookup>() as i32, flags);
+    if fib::lookup(md, &mut fib_params, flags).is_ok() {
+        match packet {
+            Packet::Ipv4(mut hdr) => {
+                let iph = unsafe { hdr.as_mut() };
 
-    Ok(Action::Pass)
+                let check = iph.check as u32 + 0x0100u32.to_be();
+
+                iph.check = (check + if check >= 0xFFFF { 1 } else { 0}) as sum16;
+                iph.ttl -= 1;
+            }
+            Packet::Ipv6(mut hdr) => {
+                let ip6h = unsafe { hdr.as_mut() };
+
+                ip6h.hop_limit -= 1;
+            }
+        }
+
+        let eth = unsafe { eth.as_mut() };
+
+        eth.dest = fib_params.dmac.into();
+        eth.source = fib_params.smac.into();
+
+        Ok(redirect_map(&tx_port, fib_params.ifindex))
+    } else {
+        Ok(Action::Pass)
+    }
 }

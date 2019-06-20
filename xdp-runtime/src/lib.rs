@@ -2,13 +2,19 @@
 
 pub mod net;
 
+mod kernel;
+pub use kernel::*;
+
 use core::ops::Deref;
 use core::ptr::NonNull;
 use core::slice;
 
-use untrusted::Input;
-
-use ebpf_runtime::ffi;
+use ebpf_runtime::{
+    ffi, helpers,
+    kernel::fib,
+    untrusted::{self, Input},
+    MapSpec, TryFrom,
+};
 
 pub const XDP_PACKET_HEADROOM: usize = 256;
 
@@ -18,7 +24,7 @@ pub const XDP_PACKET_HEADROOM: usize = 256;
 /// All other return codes are reserved for future use.
 /// Unknown return codes will result in packet drops and a warning via bpf_warn_invalid_xdp_action().
 #[repr(u32)]
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, TryFrom)]
 pub enum Action {
     Aborted = ffi::xdp_action_XDP_ABORTED,
     Drop = ffi::xdp_action_XDP_DROP,
@@ -38,6 +44,15 @@ impl Deref for Metadata {
     #[inline]
     fn deref(&self) -> &Self::Target {
         unsafe { self.0.as_ref() }
+    }
+}
+
+impl fib::Context for &Metadata {
+    type CType = ffi::xdp_md;
+
+    #[inline]
+    fn as_ptr(&self) -> *mut Self::CType {
+        self.0.as_ptr()
     }
 }
 

@@ -1106,7 +1106,7 @@ ebpf_helpers! {
     ///
     /// Return `XDP_REDIRECT` on success, or `XDP_ABORTED` on error.
     fn bpf_redirect_map(
-        map: *mut ffi::bpf_map,
+        map: *const ffi::bpf_map,
         key: u32,
         flags: u64
     ) -> i32 = bpf_func_id_BPF_FUNC_redirect_map;
@@ -1121,7 +1121,7 @@ ebpf_helpers! {
     ///
     /// Return `SK_PASS` on success, or `SK_DROP` on error.
     fn bpf_sk_redirect_map(
-        map: *mut ffi::bpf_map,
+        map: *const ffi::bpf_map,
         key: u32,
         flags: u64
     ) -> i32 = bpf_func_id_BPF_FUNC_sk_redirect_map;
@@ -1593,11 +1593,9 @@ ebpf_helpers! {
     /// following values:
     ///
     /// - `BPF_FIB_LOOKUP_DIRECT`
-    /// 	Do a direct table lookup vs full lookup using FIB
-    /// 	rules.
+    /// 	Do a direct table lookup vs full lookup using FIB rules.
     /// - `BPF_FIB_LOOKUP_OUTPUT`
-    /// 	Perform lookup from an egress perspective (default is
-    /// 	ingress).
+    /// 	Perform lookup from an egress perspective (default is ingress).
     ///
     /// *ctx* is either `struct xdp_md` for XDP programs or
     /// `struct sk_buff` tc cls_act programs.
@@ -1608,8 +1606,8 @@ ebpf_helpers! {
     /// - > 0 one of `BPF_FIB_LKUP_RET_` codes explaining why the
     ///   packet is not forwarded or needs assist from full stack
     fn bpf_fib_lookup(
-        ctx: *const c_void,
-        params: *const ffi::bpf_fib_lookup,
+        ctx: *mut c_void,
+        params: *mut ffi::bpf_fib_lookup,
         plen: i32,
         flags: u32
     ) -> i32 = bpf_func_id_BPF_FUNC_fib_lookup;

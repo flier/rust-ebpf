@@ -25,6 +25,11 @@ fn generate_binding_file() -> Result<(), Error> {
         .whitelist_var("(BPF|LIBBPF|bpf)_.*")
         .whitelist_type("(bpf|libbpf|xdp|sk)_.*")
         .whitelist_function("(bpf|btf)_.*")
+        .derive_debug(true)
+        .derive_default(true)
+        .derive_partialeq(true)
+        .impl_debug(true)
+        .impl_partialeq(true)
         .generate()
         .map_err(|_| err_msg("generate eBPF bindings"))?
         .write_to_file(out_dir.join("raw.rs"))
@@ -88,11 +93,19 @@ fn generate_binding_file() -> Result<(), Error> {
                 format!("-I{}", arch_dir.join("include").to_string_lossy()),
                 format!("-I{}", arch_dir.join("include/generated").to_string_lossy()),
                 format!("-I{}", build_dir.join("include").to_string_lossy()),
-                format!("-I{}", build_dir.join("include/generated").to_string_lossy()),
+                format!(
+                    "-I{}",
+                    build_dir.join("include/generated").to_string_lossy()
+                ),
             ])
             .whitelist_type("(bpf_sock_ops_kern|bpf_perf_event_data|sk_buff|xdp_buff|pt_regs)")
             .opaque_type("sk_buff|sock")
             .ignore_functions()
+            .derive_debug(true)
+            .derive_default(true)
+            .derive_partialeq(true)
+            .impl_debug(true)
+            .impl_partialeq(true)
             .generate()
             .map_err(|_| err_msg("generate kernel bindings"))?
             .write_to_file(out_dir.join("kernel.rs"))
@@ -110,7 +123,6 @@ fn generate_binding_file() -> Result<(), Error> {
 fn main() -> Result<(), Error> {
     generate_binding_file().context("generate binding files")?;
 
-    println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=src/raw.h");
     println!("cargo:rerun-if-changed=src/kernel.h");
 

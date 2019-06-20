@@ -3,7 +3,7 @@
 pub type __u64 = ::std::os::raw::c_ulonglong;
 pub type u32 = ::std::os::raw::c_uint;
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct pt_regs {
     pub r15: ::std::os::raw::c_ulong,
     pub r14: ::std::os::raw::c_ulong,
@@ -251,7 +251,7 @@ fn bindgen_test_layout_pt_regs() {
     );
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct sock {
     _unused: [u8; 0],
 }
@@ -328,7 +328,7 @@ pub struct sock {
 #[doc = "\t@users: User count - see {datagram,tcp}.c"]
 #[repr(C)]
 #[repr(align(8))]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct sk_buff {
     pub _bindgen_opaque_blob: [u64; 29usize],
 }
@@ -340,7 +340,7 @@ pub union sk_buff__bindgen_ty_1 {
 }
 #[repr(C)]
 #[repr(align(8))]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct sk_buff__bindgen_ty_1__bindgen_ty_1 {
     pub _bindgen_opaque_blob: [u64; 3usize],
 }
@@ -368,6 +368,19 @@ fn bindgen_test_layout_sk_buff__bindgen_ty_1__bindgen_ty_1__bindgen_ty_1() {
             stringify!(sk_buff__bindgen_ty_1__bindgen_ty_1__bindgen_ty_1)
         )
     );
+}
+impl Default for sk_buff__bindgen_ty_1__bindgen_ty_1__bindgen_ty_1 {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+impl ::std::fmt::Debug for sk_buff__bindgen_ty_1__bindgen_ty_1__bindgen_ty_1 {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        write!(
+            f,
+            "sk_buff__bindgen_ty_1__bindgen_ty_1__bindgen_ty_1 {{ opaque }}"
+        )
+    }
 }
 #[test]
 fn bindgen_test_layout_sk_buff__bindgen_ty_1__bindgen_ty_1() {
@@ -398,6 +411,16 @@ fn bindgen_test_layout_sk_buff__bindgen_ty_1() {
         concat!("Alignment of ", stringify!(sk_buff__bindgen_ty_1))
     );
 }
+impl Default for sk_buff__bindgen_ty_1 {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+impl ::std::fmt::Debug for sk_buff__bindgen_ty_1 {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        write!(f, "sk_buff__bindgen_ty_1 {{ opaque }}")
+    }
+}
 #[repr(C)]
 #[repr(align(8))]
 #[derive(Copy, Clone)]
@@ -417,6 +440,16 @@ fn bindgen_test_layout_sk_buff__bindgen_ty_2() {
         concat!("Alignment of ", stringify!(sk_buff__bindgen_ty_2))
     );
 }
+impl Default for sk_buff__bindgen_ty_2 {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+impl ::std::fmt::Debug for sk_buff__bindgen_ty_2 {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        write!(f, "sk_buff__bindgen_ty_2 {{ opaque }}")
+    }
+}
 #[repr(C)]
 #[repr(align(8))]
 #[derive(Copy, Clone)]
@@ -425,7 +458,7 @@ pub union sk_buff__bindgen_ty_3 {
 }
 #[repr(C)]
 #[repr(align(8))]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct sk_buff__bindgen_ty_3__bindgen_ty_1 {
     pub _bindgen_opaque_blob: [u64; 2usize],
 }
@@ -458,6 +491,16 @@ fn bindgen_test_layout_sk_buff__bindgen_ty_3() {
         concat!("Alignment of ", stringify!(sk_buff__bindgen_ty_3))
     );
 }
+impl Default for sk_buff__bindgen_ty_3 {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+impl ::std::fmt::Debug for sk_buff__bindgen_ty_3 {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        write!(f, "sk_buff__bindgen_ty_3 {{ opaque }}")
+    }
+}
 #[repr(C)]
 #[repr(align(4))]
 #[derive(Copy, Clone)]
@@ -466,7 +509,7 @@ pub union sk_buff__bindgen_ty_4 {
 }
 #[repr(C)]
 #[repr(align(2))]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct sk_buff__bindgen_ty_4__bindgen_ty_1 {
     pub _bindgen_opaque_blob: [u16; 2usize],
 }
@@ -499,6 +542,16 @@ fn bindgen_test_layout_sk_buff__bindgen_ty_4() {
         concat!("Alignment of ", stringify!(sk_buff__bindgen_ty_4))
     );
 }
+impl Default for sk_buff__bindgen_ty_4 {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+impl ::std::fmt::Debug for sk_buff__bindgen_ty_4 {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        write!(f, "sk_buff__bindgen_ty_4 {{ opaque }}")
+    }
+}
 #[repr(C)]
 #[repr(align(4))]
 #[derive(Copy, Clone)]
@@ -517,6 +570,16 @@ fn bindgen_test_layout_sk_buff__bindgen_ty_5() {
         4usize,
         concat!("Alignment of ", stringify!(sk_buff__bindgen_ty_5))
     );
+}
+impl Default for sk_buff__bindgen_ty_5 {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+impl ::std::fmt::Debug for sk_buff__bindgen_ty_5 {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        write!(f, "sk_buff__bindgen_ty_5 {{ opaque }}")
+    }
 }
 #[repr(C)]
 #[repr(align(4))]
@@ -537,6 +600,16 @@ fn bindgen_test_layout_sk_buff__bindgen_ty_6() {
         concat!("Alignment of ", stringify!(sk_buff__bindgen_ty_6))
     );
 }
+impl Default for sk_buff__bindgen_ty_6 {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+impl ::std::fmt::Debug for sk_buff__bindgen_ty_6 {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        write!(f, "sk_buff__bindgen_ty_6 {{ opaque }}")
+    }
+}
 #[repr(C)]
 #[repr(align(2))]
 #[derive(Copy, Clone)]
@@ -556,6 +629,16 @@ fn bindgen_test_layout_sk_buff__bindgen_ty_7() {
         concat!("Alignment of ", stringify!(sk_buff__bindgen_ty_7))
     );
 }
+impl Default for sk_buff__bindgen_ty_7 {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+impl ::std::fmt::Debug for sk_buff__bindgen_ty_7 {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        write!(f, "sk_buff__bindgen_ty_7 {{ opaque }}")
+    }
+}
 #[test]
 fn bindgen_test_layout_sk_buff() {
     assert_eq!(
@@ -571,7 +654,7 @@ fn bindgen_test_layout_sk_buff() {
 }
 pub type bpf_user_pt_regs_t = pt_regs;
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct bpf_perf_event_data {
     pub regs: bpf_user_pt_regs_t,
     pub sample_period: __u64,
@@ -612,7 +695,7 @@ fn bindgen_test_layout_bpf_perf_event_data() {
     );
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct xdp_buff {
     pub data: *mut ::std::os::raw::c_void,
     pub data_end: *mut ::std::os::raw::c_void,
@@ -672,6 +755,11 @@ fn bindgen_test_layout_xdp_buff() {
         )
     );
 }
+impl Default for xdp_buff {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct bpf_sock_ops_kern {
@@ -724,6 +812,16 @@ fn bindgen_test_layout_bpf_sock_ops_kern__bindgen_ty_1() {
         )
     );
 }
+impl Default for bpf_sock_ops_kern__bindgen_ty_1 {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+impl ::std::fmt::Debug for bpf_sock_ops_kern__bindgen_ty_1 {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        write!(f, "bpf_sock_ops_kern__bindgen_ty_1 {{ union }}")
+    }
+}
 #[test]
 fn bindgen_test_layout_bpf_sock_ops_kern() {
     assert_eq!(
@@ -756,4 +854,18 @@ fn bindgen_test_layout_bpf_sock_ops_kern() {
             stringify!(op)
         )
     );
+}
+impl Default for bpf_sock_ops_kern {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+impl ::std::fmt::Debug for bpf_sock_ops_kern {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        write!(
+            f,
+            "bpf_sock_ops_kern {{ sk: {:?}, op: {:?}, __bindgen_anon_1: {:?} }}",
+            self.sk, self.op, self.__bindgen_anon_1
+        )
+    }
 }
