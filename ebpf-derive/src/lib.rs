@@ -8,9 +8,64 @@ use syn::{parse_macro_input, parse_quote};
 #[proc_macro_derive(TryFrom)]
 pub fn try_from(input: TokenStream) -> TokenStream {
     let syn::DeriveInput {
-        attrs, ident, data, ..
+        attrs,
+        ident,
+        generics,
+        data,
+        ..
     } = parse_macro_input!(input);
 
+    let expanded = match data {
+        syn::Data::Enum(syn::DataEnum { variants, .. }) => {
+            let ty = if let Some(ty) = extract_repr_ty(&attrs) {
+                ty
+            } else {
+                return Error::custom("missing or malform #[repr(..)] attribute")
+                    .with_span(&ident)
+                    .write_errors()
+                    .into();
+            };
+
+            let variants = variants.iter().flat_map(|var| match var {
+                syn::Variant {
+                    ident: varname,
+                    discriminant: Some((_, repr)),
+                    ..
+                } => Some(quote! {
+                    #repr => {
+                        Ok(#ident :: #varname)
+                    }
+                }),
+                _ => None,
+            });
+
+            let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
+
+            quote! {
+                impl #impl_generics core::convert::TryFrom<#ty> for #ident #ty_generics #where_clause {
+                    type Error = #ty;
+
+                    #[inline]
+                    fn try_from(value: #ty) -> Result<Self, Self::Error> {
+                        match value {
+                            #( #variants , )*
+                            _ => Err(value)
+                        }
+                    }
+                }
+            }
+        }
+        _ => unimplemented!(),
+    };
+
+    // eprintln!("expanded: {}", expanded);
+
+    expanded.into()
+}
+
+fn extract_repr_ty<'ast>(
+    attrs: impl IntoIterator<Item = &'ast syn::Attribute>,
+) -> Option<syn::Ident> {
     #[derive(Default)]
     struct VisitRepr {
         ty: Option<syn::Ident>,
@@ -32,50 +87,7 @@ pub fn try_from(input: TokenStream) -> TokenStream {
         }
     }
 
-    let ty = if let Some(ty) = visitor.ty {
-        ty
-    } else {
-        return Error::custom("missing or malform #[repr(..)] attribute")
-            .with_span(&ident)
-            .write_errors()
-            .into();
-    };
-
-    let expanded = match data {
-        syn::Data::Enum(syn::DataEnum { variants, .. }) => {
-            let variants = variants.iter().flat_map(|var| match var {
-                syn::Variant {
-                    ident: varname,
-                    discriminant: Some((_, repr)),
-                    ..
-                } => Some(quote! {
-                    #repr => {
-                        Ok(#ident :: #varname)
-                    }
-                }),
-                _ => None,
-            });
-
-            quote! {
-                impl core::convert::TryFrom<#ty> for #ident {
-                    type Error = #ty;
-
-                    #[inline]
-                    fn try_from(value: #ty) -> Result<Self, Self::Error> {
-                        match value {
-                            #( #variants , )*
-                            _ => Err(value)
-                        }
-                    }
-                }
-            }
-        }
-        _ => unimplemented!(),
-    };
-
-    // eprintln!("expanded: {}", expanded);
-
-    expanded.into()
+    visitor.ty
 }
 
 #[proc_macro]
