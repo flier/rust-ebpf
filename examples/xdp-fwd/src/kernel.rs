@@ -1,14 +1,13 @@
 #![no_std]
 
-extern crate untrusted;
 #[macro_use]
 extern crate ebpf_runtime;
-extern crate xdp_runtime;
 
 use core::ptr::NonNull;
 
 use ebpf_runtime::{
     sum16,
+    untrusted,
     kernel::fib,
     EbpfError::{self, *},
 };

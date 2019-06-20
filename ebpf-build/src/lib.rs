@@ -8,7 +8,7 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use ebpf_sys::BPF_MAXINSNS;
-use failure::{format_err, Error, ResultExt};
+use failure::{err_msg, format_err, Error, ResultExt};
 
 const DEFAULT_OPT_LEVEL: usize = 3; // all optimizations
 const DEFAULT_DEBUG_INFO: usize = 0; // no debug info at all
@@ -19,6 +19,7 @@ const DEFAULT_TARGET: &str = "bpf";
 pub struct Builder {
     rustc: Option<PathBuf>,
     llc: Option<PathBuf>,
+    manifest_dir: Option<PathBuf>,
     deps: Vec<String>,
     profile: Option<String>,
     edition: Option<usize>,
@@ -47,6 +48,11 @@ impl Builder {
 
     pub fn llc<S: Into<PathBuf>>(mut self, llc: S) -> Self {
         self.llc = Some(llc.into());
+        self
+    }
+
+    pub fn manifest_dir<S: Into<PathBuf>>(mut self, manifest_dir: S) -> Self {
+        self.manifest_dir = Some(manifest_dir.into());
         self
     }
 
@@ -124,14 +130,13 @@ impl Builder {
     }
 
     pub fn build(self) -> Result<PathBuf, Error> {
+        let manifest_dir = self
+            .manifest_dir
+            .or_else(|| env::var_os("CARGO_MANIFEST_DIR").map(|s| s.into()))
+            .expect("CARGO_MANIFEST_DIR");
         let kernel_file = self
             .kernel
-            .or_else(|| {
-                env::var("CARGO_MANIFEST_DIR")
-                    .ok()
-                    .map(|s| PathBuf::from(s).join("src/lib.rs"))
-            })
-            .expect("CARGO_MANIFEST_DIR");
+            .unwrap_or_else(|| manifest_dir.join("src/lib.rs"));
         let kernel_name = kernel_file.file_stem().expect("kernel").to_string_lossy();
         let out_dir = self
             .out_dir
@@ -147,6 +152,15 @@ impl Builder {
             .expect("PROFILE");
         let target_dir = metadata.target_directory.join(profile);
         let deps_dir = target_dir.join("deps");
+
+        let edition = self.edition.or_else(|| {
+            metadata
+                .resolve
+                .as_ref()
+                .and_then(|resolve| resolve.root.as_ref())
+                .and_then(|pkgid| metadata.packages.iter().find(|pkg| pkgid == &pkg.id))
+                .and_then(|pkg| pkg.edition.parse().ok())
+        });
 
         // emit IR/bitcode
         let rustc = self
@@ -184,7 +198,7 @@ impl Builder {
             .arg("-L")
             .arg(format!("dependency={}", deps_dir.to_string_lossy()));
 
-        if let Some(edition) = self.edition {
+        if let Some(edition) = edition {
             rustc.arg(format!("--edition={}", edition));
         }
 
@@ -204,11 +218,14 @@ impl Builder {
             rustc.arg("--codegen").arg(opt);
         }
 
-        for pkgid in self
-            .deps
-            .into_iter()
-            .chain(extract_extern_crate(&kernel_file)?)
-        {
+        let deps = self.deps.into_iter().chain(match edition {
+            Some(edition) if edition >= 2018 => {
+                extract_build_dependencies(&manifest_dir.join("Cargo.toml"))?
+            }
+            _ => extract_extern_crate(&kernel_file)?,
+        });
+
+        for pkgid in deps {
             rustc
                 .arg("--extern")
                 .arg(find_rlib(&deps_dir, &pkgid.replace("-", "_"))?);
@@ -253,19 +270,40 @@ impl Builder {
     }
 }
 
-fn extract_extern_crate(kernel_file: &Path) -> Result<impl Iterator<Item = String>, Error> {
+fn extract_build_dependencies(manifest_file: &Path) -> Result<Vec<String>, Error> {
+    let mut file = File::open(manifest_file)?;
+    let mut content = String::new();
+    file.read_to_string(&mut content)?;
+
+    match content.parse()? {
+        toml::Value::Table(manifest) => {
+            if let Some(toml::Value::Table(deps)) = manifest.get("build-dependencies") {
+                Ok(deps.keys().cloned().collect())
+            } else {
+                Err(err_msg("missing [build-dependencies] section"))
+            }
+        }
+        _ => Err(err_msg("invalid format")),
+    }
+}
+
+fn extract_extern_crate(kernel_file: &Path) -> Result<Vec<String>, Error> {
     let mut file = File::open(kernel_file)?;
     let mut content = String::new();
     file.read_to_string(&mut content)?;
     let file = syn::parse_file(&content)?;
 
-    Ok(file.items.into_iter().flat_map(|item| {
-        if let syn::Item::ExternCrate(syn::ItemExternCrate { ident, .. }) = item {
-            Some(ident.to_string())
-        } else {
-            None
-        }
-    }))
+    Ok(file
+        .items
+        .into_iter()
+        .flat_map(|item| {
+            if let syn::Item::ExternCrate(syn::ItemExternCrate { ident, .. }) = item {
+                Some(ident.to_string())
+            } else {
+                None
+            }
+        })
+        .collect())
 }
 
 fn find_rlib(dir: &Path, name: &str) -> Result<String, Error> {
