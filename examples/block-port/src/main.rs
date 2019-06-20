@@ -1,9 +1,9 @@
 #[macro_use]
 extern crate log;
+extern crate failure;
+extern crate ebpf_loader;
 
 use failure::Error;
-
-use ebpf_loader;
 
 const KERNEL: &[u8] = include_bytes!(env!("KERNEL"));
 

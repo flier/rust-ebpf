@@ -1,5 +1,8 @@
+#![no_std]
+
 #[macro_use]
 extern crate ebpf_runtime;
+extern crate xdp_runtime;
 
 use xdp_runtime::{Action, Metadata, net::ether};
 
