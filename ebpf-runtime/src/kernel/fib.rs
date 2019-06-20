@@ -1,8 +1,7 @@
-use core::convert::{AsMut, AsRef, TryFrom};
+use core::convert::{AsMut, TryFrom};
 use core::mem;
-use core::ops::{Deref, DerefMut};
 
-use crate::{be32, ffi, helpers::bpf_fib_lookup};
+use crate::{be32, ffi, helpers::bpf_fib_lookup, trivial};
 
 bitflags! {
     pub struct Lookup: u32 {
@@ -13,45 +12,8 @@ bitflags! {
     }
 }
 
-#[repr(transparent)]
-#[derive(Clone, Debug)]
-pub struct Params(ffi::bpf_fib_lookup);
-
-impl Default for Params {
-    #[inline]
-    fn default() -> Self {
-        unsafe { mem::zeroed() }
-    }
-}
-
-impl Deref for Params {
-    type Target = ffi::bpf_fib_lookup;
-
-    #[inline]
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl DerefMut for Params {
-    #[inline]
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
-impl AsRef<ffi::bpf_fib_lookup> for Params {
-    #[inline]
-    fn as_ref(&self) -> &ffi::bpf_fib_lookup {
-        &self.0
-    }
-}
-
-impl AsMut<ffi::bpf_fib_lookup> for Params {
-    #[inline]
-    fn as_mut(&mut self) -> &mut ffi::bpf_fib_lookup {
-        &mut self.0
-    }
+trivial! {
+    pub struct Params(ffi::bpf_fib_lookup);
 }
 
 impl Params {
