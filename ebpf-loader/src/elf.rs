@@ -16,8 +16,8 @@ use ebpf_core::{
     BPF_VERSION_SEC, BTF_ELF_SEC, BTF_EXT_ELF_SEC,
 };
 
+use crate::parser::Parser;
 use crate::prog::prog_type_by_name;
-use crate::Parser;
 
 impl<'a> Parser<goblin::elf::Elf<'a>> {
     pub fn parse(&self, buf: &[u8]) -> Result<Object, Error> {
