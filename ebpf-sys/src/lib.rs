@@ -31,6 +31,8 @@ cfg_if! {
 
 pub use kernel::{bpf_perf_event_data, bpf_sock_ops_kern, pt_regs, sk_buff, xdp_buff};
 
+pub type sk_msg_buff = ();
+
 macro_rules! BIT {
     ($shift:expr) => {
         (1 << $shift)

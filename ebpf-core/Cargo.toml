@@ -7,8 +7,6 @@ edition = "2018"
 [dependencies]
 failure = "0.1"
 bitflags = "1.1"
-num-traits = "0.2"
-num-derive = "0.2"
-derive_more = "0.15"
 
 ebpf-sys = { version = "0.1", path = "../ebpf-sys" }
+ebpf-derive = { version = "0.1", path = "../ebpf-derive" }

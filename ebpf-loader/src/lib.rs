@@ -1,7 +1,10 @@
 #[macro_use]
 extern crate log;
+#[macro_use]
+extern crate lazy_static;
 
 mod elf;
+mod prog;
 
 use std::fs::File;
 use std::io::prelude::*;
@@ -16,7 +19,6 @@ pub fn load<P: AsRef<Path>>(path: P) -> Result<Object, Error> {
 
     let mut f = File::open(path)?;
     let mut buf = Vec::new();
-
     f.read_to_end(&mut buf)?;
 
     parse(&buf)

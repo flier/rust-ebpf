@@ -9,5 +9,4 @@ default = ["std"]
 std = []
 
 [dependencies]
-ebpf-sys = { version = "0.1", path = "../ebpf-sys" }
 ebpf-runtime = { version = "0.1", path = "../ebpf-runtime" }

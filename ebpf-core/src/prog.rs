@@ -1,8 +1,75 @@
 use crate::ffi;
 
+#[repr(u32)]
+#[derive(Clone, Copy, Debug, PartialEq, TryFrom)]
+pub enum Type {
+    Unspec = ffi::bpf_prog_type_BPF_PROG_TYPE_UNSPEC,
+    SocketFilter = ffi::bpf_prog_type_BPF_PROG_TYPE_SOCKET_FILTER,
+    KProbe = ffi::bpf_prog_type_BPF_PROG_TYPE_KPROBE,
+    SchedClass = ffi::bpf_prog_type_BPF_PROG_TYPE_SCHED_CLS,
+    SchedAction = ffi::bpf_prog_type_BPF_PROG_TYPE_SCHED_ACT,
+    TracePoint = ffi::bpf_prog_type_BPF_PROG_TYPE_TRACEPOINT,
+    XDP = ffi::bpf_prog_type_BPF_PROG_TYPE_XDP,
+    PerfEvent = ffi::bpf_prog_type_BPF_PROG_TYPE_PERF_EVENT,
+    CGroupSkb = ffi::bpf_prog_type_BPF_PROG_TYPE_CGROUP_SKB,
+    CGroupSock = ffi::bpf_prog_type_BPF_PROG_TYPE_CGROUP_SOCK,
+    LwtIn = ffi::bpf_prog_type_BPF_PROG_TYPE_LWT_IN,
+    LwtOut = ffi::bpf_prog_type_BPF_PROG_TYPE_LWT_OUT,
+    LwtXmit = ffi::bpf_prog_type_BPF_PROG_TYPE_LWT_XMIT,
+    SockOps = ffi::bpf_prog_type_BPF_PROG_TYPE_SOCK_OPS,
+    SkSkb = ffi::bpf_prog_type_BPF_PROG_TYPE_SK_SKB,
+    CGroupDevice = ffi::bpf_prog_type_BPF_PROG_TYPE_CGROUP_DEVICE,
+    SkMsg = ffi::bpf_prog_type_BPF_PROG_TYPE_SK_MSG,
+    RawTracePoint = ffi::bpf_prog_type_BPF_PROG_TYPE_RAW_TRACEPOINT,
+    CGroupSockAddr = ffi::bpf_prog_type_BPF_PROG_TYPE_CGROUP_SOCK_ADDR,
+    LwtSeg6Local = ffi::bpf_prog_type_BPF_PROG_TYPE_LWT_SEG6LOCAL,
+    LircMode2 = ffi::bpf_prog_type_BPF_PROG_TYPE_LIRC_MODE2,
+    SkReusePort = ffi::bpf_prog_type_BPF_PROG_TYPE_SK_REUSEPORT,
+    FlowDissector = ffi::bpf_prog_type_BPF_PROG_TYPE_FLOW_DISSECTOR,
+    CGroupSysctl = ffi::bpf_prog_type_BPF_PROG_TYPE_CGROUP_SYSCTL,
+    RawTracePointWritable = ffi::bpf_prog_type_BPF_PROG_TYPE_RAW_TRACEPOINT_WRITABLE,
+}
+
+impl Default for Type {
+    fn default() -> Self {
+        Type::Unspec
+    }
+}
+
+const BPF_CGROUP_UDP4_RECVMSG: u32 = ffi::bpf_attach_type_BPF_CGROUP_SYSCTL + 1;
+const BPF_CGROUP_UDP6_RECVMSG: u32 = BPF_CGROUP_UDP4_RECVMSG + 1;
+
+#[repr(u32)]
+#[derive(Clone, Copy, Debug, PartialEq, TryFrom)]
+pub enum Attach {
+    CGroupInetIngress = ffi::bpf_attach_type_BPF_CGROUP_INET_INGRESS,
+    CGroupInetEgress = ffi::bpf_attach_type_BPF_CGROUP_INET_EGRESS,
+    CGroupInetSockCreate = ffi::bpf_attach_type_BPF_CGROUP_INET_SOCK_CREATE,
+    CGroupSockOps = ffi::bpf_attach_type_BPF_CGROUP_SOCK_OPS,
+    SkSkbStreamParser = ffi::bpf_attach_type_BPF_SK_SKB_STREAM_PARSER,
+    SkSkbStreamVerdict = ffi::bpf_attach_type_BPF_SK_SKB_STREAM_VERDICT,
+    CGroupDevice = ffi::bpf_attach_type_BPF_CGROUP_DEVICE,
+    SkMsgVerdict = ffi::bpf_attach_type_BPF_SK_MSG_VERDICT,
+    CGroupInet4Bind = ffi::bpf_attach_type_BPF_CGROUP_INET4_BIND,
+    CGroupInet6Bind = ffi::bpf_attach_type_BPF_CGROUP_INET6_BIND,
+    CGroupInet4Connect = ffi::bpf_attach_type_BPF_CGROUP_INET4_CONNECT,
+    CGroupInet6Connect = ffi::bpf_attach_type_BPF_CGROUP_INET6_CONNECT,
+    CGroupInet4PostBind = ffi::bpf_attach_type_BPF_CGROUP_INET4_POST_BIND,
+    CGroupInet6PostBind = ffi::bpf_attach_type_BPF_CGROUP_INET6_POST_BIND,
+    CGroupUdp4Sendmsg = ffi::bpf_attach_type_BPF_CGROUP_UDP4_SENDMSG,
+    CGroupUdp6Sendmsg = ffi::bpf_attach_type_BPF_CGROUP_UDP6_SENDMSG,
+    LircMode2 = ffi::bpf_attach_type_BPF_LIRC_MODE2,
+    FlowDissector = ffi::bpf_attach_type_BPF_FLOW_DISSECTOR,
+    CGroupSysctl = ffi::bpf_attach_type_BPF_CGROUP_SYSCTL,
+    CGroupUdp4Recvmsg = BPF_CGROUP_UDP4_RECVMSG,
+    CGroupUdp6Recvmsg = BPF_CGROUP_UDP6_RECVMSG,
+}
+
 #[derive(Debug, Default)]
 pub struct Program {
     pub name: String,
+    pub ty: Type,
+    pub attach: Option<Attach>,
     pub title: String,
     pub idx: usize,
     pub insns: Vec<Insn>,
@@ -10,9 +77,18 @@ pub struct Program {
 }
 
 impl Program {
-    pub fn new<S: Into<String>>(name: S, title: S, idx: usize, insns: Vec<Insn>) -> Self {
+    pub fn new<S: Into<String>>(
+        name: S,
+        ty: Type,
+        attach: Option<Attach>,
+        title: S,
+        idx: usize,
+        insns: Vec<Insn>,
+    ) -> Self {
         Program {
             name: name.into(),
+            ty,
+            attach,
             title: title.into(),
             idx,
             insns,

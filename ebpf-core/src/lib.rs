@@ -1,16 +1,15 @@
 #[macro_use]
 extern crate bitflags;
 #[macro_use]
-extern crate derive_more;
-#[macro_use]
-extern crate num_derive;
+extern crate ebpf_derive;
+
 pub extern crate ebpf_sys as ffi;
 
 pub mod map;
 pub mod prog;
 
 pub use map::Map;
-pub use prog::{Insn, Opcode, Program};
+pub use prog::{Attach, Insn, Opcode, Program, Type};
 
 pub const BPF_LICENSE_SEC: &str = "license";
 pub const BPF_VERSION_SEC: &str = "version";

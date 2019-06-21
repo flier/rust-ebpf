@@ -12,10 +12,11 @@ use goblin::elf::{
 };
 
 use ebpf_core::{
-    ffi, prog, Insn, Map, Object, Opcode, Program, BPF_LICENSE_SEC, BPF_MAPS_SEC, BPF_VERSION_SEC,
-    BTF_ELF_SEC, BTF_EXT_ELF_SEC,
+    ffi, prog, Attach, Insn, Map, Object, Opcode, Program, Type, BPF_LICENSE_SEC, BPF_MAPS_SEC,
+    BPF_VERSION_SEC, BTF_ELF_SEC, BTF_EXT_ELF_SEC,
 };
 
+use crate::prog::prog_type_by_name;
 use crate::Parser;
 
 impl<'a> Parser<goblin::elf::Elf<'a>> {
@@ -81,6 +82,7 @@ impl<'a> Parser<goblin::elf::Elf<'a>> {
                         text_section = Some(idx);
                     }
 
+                    let (ty, attach) = prog_type_by_name(name).unwrap_or((Type::Unspec, None));
                     let insns = unsafe {
                         let data = buf.as_ptr().add(sec.sh_offset as usize);
                         let len = sec.sh_size as usize / mem::size_of::<Insn>();
@@ -89,13 +91,14 @@ impl<'a> Parser<goblin::elf::Elf<'a>> {
                     };
 
                     debug!(
-                        "kernel program #{} @ section `{}` with {} insns",
+                        "{:?} kernel program #{} @ section `{}` with {} insns",
+                        ty,
                         idx,
                         name,
                         insns.len()
                     );
 
-                    programs.push((name, idx, insns.to_vec()));
+                    programs.push((name, ty, attach, idx, insns.to_vec()));
                 }
                 _ if sec.sh_type == SHT_REL => {}
                 _ => {
@@ -190,12 +193,12 @@ impl<'a> Parser<goblin::elf::Elf<'a>> {
 
     fn resolve_program_names(
         &self,
-        programs: impl IntoIterator<Item = (&'a str, usize, Vec<Insn>)>,
+        programs: impl IntoIterator<Item = (&'a str, Type, Option<Attach>, usize, Vec<Insn>)>,
         text_section: Option<usize>,
     ) -> Result<Vec<Program>, Error> {
         programs
             .into_iter()
-            .map(|(title, idx, insns)| {
+            .map(|(title, ty, attach, idx, insns)| {
                 let name = self
                     .resolve_symbol(|sym| sym.st_shndx == idx && sym.st_bind() == STB_GLOBAL)
                     .and_then(|sym| self.resolve_name(sym.st_name))
@@ -215,7 +218,7 @@ impl<'a> Parser<goblin::elf::Elf<'a>> {
                     insns.len()
                 );
 
-                Ok(Program::new(name, title, idx, insns))
+                Ok(Program::new(name, ty, attach, title, idx, insns))
             })
             .collect::<Result<Vec<_>, _>>()
     }

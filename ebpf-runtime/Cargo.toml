@@ -12,5 +12,4 @@ libc = "0.2"
 untrusted = { git = "https://github.com/flier/untrusted.git", branch = "inline_always", features = ["inline_always"] }
 
 ebpf-core = { version = "0.1", path = "../ebpf-core" }
-ebpf-sys = { version = "0.1", path = "../ebpf-sys" }
 ebpf-derive = { version = "0.1", path = "../ebpf-derive" }

@@ -1,10 +1,11 @@
+use core::convert::TryFrom;
+
 use failure::{format_err, Error};
-use num_traits::FromPrimitive;
 
 use crate::ffi;
 
 #[repr(u32)]
-#[derive(Clone, Copy, Debug, PartialEq, FromPrimitive, ToPrimitive)]
+#[derive(Clone, Copy, Debug, PartialEq, TryFrom)]
 pub enum Type {
     Unspec = ffi::bpf_map_type_BPF_MAP_TYPE_UNSPEC,
     Hash = ffi::bpf_map_type_BPF_MAP_TYPE_HASH,
@@ -78,8 +79,8 @@ impl Map {
         offset: usize,
         def: &ffi::bpf_map_def,
     ) -> Result<Self, Error> {
-        let ty = Type::from_u32(def.type_)
-            .ok_or_else(|| format_err!("unexpected map type: {}", def.type_))?;
+        let ty = Type::try_from(def.type_)
+            .map_err(|_| format_err!("unexpected map type: {}", def.type_))?;
 
         Ok(Map {
             name: name.into(),

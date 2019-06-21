@@ -16,14 +16,11 @@ pub mod kernel;
 
 pub use self::errors::EbpfError;
 
-pub use ebpf_core::map::{Flags as MapFlags, Spec as MapSpec, Type as MapType};
+pub use ebpf_core::{
+    ffi,
+    map::{Flags as MapFlags, Spec as MapSpec, Type as MapType},
+};
 pub use ebpf_derive::*;
-
-pub mod ffi {
-    pub use ebpf_sys::*;
-
-    pub type sk_msg_buff = ();
-}
 
 pub type be16 = u16;
 pub type be32 = u32;
