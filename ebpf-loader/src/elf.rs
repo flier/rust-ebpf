@@ -178,7 +178,7 @@ impl<'a> Parser<goblin::elf::Elf<'a>> {
                 bail!("maps section has unrecognized, non-zero options");
             }
 
-            let map = Map::with_def(name, sym.st_value as usize, &map_def)?;
+            let map = Map::with_def(name, sym.st_value as usize, self.ifindex, &map_def)?;
 
             debug!(
                 "#{} map `{}` @ section `{}`: {:?}",

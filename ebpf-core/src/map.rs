@@ -1,4 +1,5 @@
 use core::convert::TryFrom;
+use core::ops::{Deref, DerefMut};
 
 use failure::{format_err, Error};
 
@@ -44,6 +45,8 @@ impl Default for Type {
 pub struct Map {
     pub name: String,
     pub offset: usize,
+    pub ifindex: Option<u32>,
+    pub inner_map_fd: Option<u32>,
     pub spec: Spec,
 }
 
@@ -73,10 +76,33 @@ bitflags! {
     }
 }
 
+impl Spec {
+    pub fn is_map_in_map(&self) -> bool {
+        self.ty == Type::ArrayOfMaps || self.ty == Type::HashOfMaps
+    }
+}
+
+impl Deref for Map {
+    type Target = Spec;
+
+    #[inline]
+    fn deref(&self) -> &Self::Target {
+        &self.spec
+    }
+}
+
+impl DerefMut for Map {
+    #[inline]
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.spec
+    }
+}
+
 impl Map {
     pub fn with_def<S: Into<String>>(
         name: S,
         offset: usize,
+        ifindex: Option<u32>,
         def: &ffi::bpf_map_def,
     ) -> Result<Self, Error> {
         let ty = Type::try_from(def.type_)
@@ -85,6 +111,8 @@ impl Map {
         Ok(Map {
             name: name.into(),
             offset,
+            ifindex,
+            inner_map_fd: None,
             spec: Spec {
                 ty,
                 key_size: def.key_size,
@@ -95,10 +123,17 @@ impl Map {
         })
     }
 
-    pub fn with_spec<S: Into<String>>(name: S, offset: usize, spec: Spec) -> Self {
+    pub fn with_spec<S: Into<String>>(
+        name: S,
+        offset: usize,
+        ifindex: Option<u32>,
+        spec: Spec,
+    ) -> Self {
         Map {
             name: name.into(),
             offset,
+            ifindex,
+            inner_map_fd: None,
             spec,
         }
     }

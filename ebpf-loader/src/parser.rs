@@ -27,6 +27,7 @@ pub struct Parser<T> {
     pub obj: T,
     pub prog_type: Option<Type>,
     pub expected_attach_type: Option<Attach>,
+    pub ifindex: Option<u32>,
 }
 
 impl<T> Parser<T> {
@@ -35,6 +36,7 @@ impl<T> Parser<T> {
             obj,
             prog_type: None,
             expected_attach_type: None,
+            ifindex: None,
         }
     }
 }
