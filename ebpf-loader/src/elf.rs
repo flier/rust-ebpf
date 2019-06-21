@@ -82,7 +82,12 @@ impl<'a> Parser<goblin::elf::Elf<'a>> {
                         text_section = Some(idx);
                     }
 
-                    let (ty, attach) = prog_type_by_name(name).unwrap_or((Type::Unspec, None));
+                    // If type is not specified, try to guess it based on section name.
+                    let (ty, attach) = match self.prog_type {
+                        Some(ty) if ty != Type::Unspec => (ty, self.expected_attach_type),
+                        _ => prog_type_by_name(name)
+                            .ok_or_else(|| format_err!("unexpected section name: {}", name))?,
+                    };
                     let insns = unsafe {
                         let data = buf.as_ptr().add(sec.sh_offset as usize);
                         let len = sec.sh_size as usize / mem::size_of::<Insn>();
@@ -211,8 +216,9 @@ impl<'a> Parser<goblin::elf::Elf<'a>> {
                     })?;
 
                 debug!(
-                    "#{} program `{}` @ secion `{}` with {} insns",
+                    "#{} `{:?}` program `{}` @ secion `{}` with {} insns",
                     idx,
+                    ty,
                     name,
                     title,
                     insns.len()
