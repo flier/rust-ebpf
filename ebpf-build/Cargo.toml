@@ -5,7 +5,6 @@ authors = ["Flier Lu <flier.lu@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-log = "0.4"
 failure = "0.1"
 glob = "0.3"
 toml = "0.5"

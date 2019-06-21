@@ -1,6 +1,3 @@
-#[macro_use]
-extern crate log;
-
 use std::env;
 use std::fs::File;
 use std::io::{self, prelude::*};
@@ -11,7 +8,7 @@ use ebpf_sys::BPF_MAXINSNS;
 use failure::{err_msg, format_err, Error, ResultExt};
 
 const DEFAULT_OPT_LEVEL: usize = 3; // all optimizations
-const DEFAULT_DEBUG_INFO: usize = 0; // no debug info at all
+const DEFAULT_DEBUG_INFO: usize = 0; // no eprintln info at all
 const DEFAULT_INLINE_THRESHOLD: usize = BPF_MAXINSNS as usize;
 const DEFAULT_TARGET: &str = "bpf";
 
@@ -38,7 +35,30 @@ pub struct Builder {
 
 impl Builder {
     pub fn new() -> Self {
-        Default::default()
+        let rustc = env::var_os("RUSTC")
+            .map(PathBuf::from)
+            .or_else(|| Some("rustc".into()));
+        let llc = env::var_os("LLC")
+            .map(PathBuf::from)
+            .or_else(|| Some("llc".into()));
+        let manifest_dir = env::var_os("CARGO_MANIFEST_DIR").map(PathBuf::from);
+        let profile = env::var("PROFILE").ok();
+        let target = Some(DEFAULT_TARGET.to_owned());
+        let kernel = manifest_dir
+            .as_ref()
+            .map(|dir: &PathBuf| dir.join("src/kernel.rs"));
+        let out_dir = env::var_os("OUT_DIR").map(PathBuf::from);
+
+        Builder {
+            rustc,
+            llc,
+            manifest_dir,
+            profile,
+            target,
+            kernel,
+            out_dir,
+            ..Default::default()
+        }
     }
 
     pub fn rustc<S: Into<PathBuf>>(mut self, rustc: S) -> Self {
@@ -130,26 +150,18 @@ impl Builder {
     }
 
     pub fn build(self) -> Result<PathBuf, Error> {
-        let manifest_dir = self
-            .manifest_dir
-            .or_else(|| env::var_os("CARGO_MANIFEST_DIR").map(|s| s.into()))
-            .expect("CARGO_MANIFEST_DIR");
-        let kernel_file = self
-            .kernel
-            .unwrap_or_else(|| manifest_dir.join("src/lib.rs"));
-        let kernel_name = kernel_file.file_stem().expect("kernel").to_string_lossy();
-        let out_dir = self
-            .out_dir
-            .or_else(|| env::var_os("OUT_DIR").map(|s| s.into()))
-            .expect("OUT_DIR");
+        let manifest_dir = self.manifest_dir.expect("CARGO_MANIFEST_DIR");
+        let kernel_file = self.kernel.expect("KERNEL");
+        let kernel_name = kernel_file
+            .file_stem()
+            .expect("kernel name")
+            .to_string_lossy();
+        let out_dir = self.out_dir.expect("OUT_DIR");
         let bc_file = out_dir.join(format!("{}.bc", kernel_name));
         let obj_file = out_dir.join(format!("{}.o", kernel_name));
 
         let metadata = cargo_metadata::MetadataCommand::new().exec()?;
-        let profile = self
-            .profile
-            .or_else(|| env::var("PROFILE").ok())
-            .expect("PROFILE");
+        let profile = self.profile.expect("PROFILE");
         let target_dir = metadata.target_directory.join(profile);
         let deps_dir = target_dir.join("deps");
 
@@ -163,12 +175,7 @@ impl Builder {
         });
 
         // emit IR/bitcode
-        let rustc = self
-            .rustc
-            .or_else(|| env::var_os("RUSTC").map(|s| s.into()))
-            .unwrap_or_else(|| "rustc".into());
-
-        let mut rustc = Command::new(rustc);
+        let mut rustc = Command::new(self.rustc.expect("RUSTC"));
 
         rustc
             .arg(&kernel_file)
@@ -234,15 +241,10 @@ impl Builder {
         rustc.run().context("compile eBPF kernel")?;
 
         // compile bitcode
-        let llc = self
-            .llc
-            .or_else(|| env::var_os("LLC").map(|s| s.into()))
-            .unwrap_or_else(|| "llc".into());
-
-        Command::new(llc)
+        Command::new(self.llc.expect("LLC"))
             .arg(format!(
                 "-march={}",
-                self.target.unwrap_or_else(|| DEFAULT_TARGET.to_owned())
+                self.target.expect("TARGET")
             ))
             .arg("-filetype=obj")
             .arg(&bc_file)
@@ -336,21 +338,21 @@ impl Runable for Command {
     type Error = Error;
 
     fn run(&mut self) -> Result<Self::Output, Error> {
-        debug!("run: {:?}", self);
+        eprintln!("run: {:?}", self);
 
         let output = self.output()?;
 
         if output.status.success() {
             if !output.stdout.is_empty() {
-                debug!("STDOUT: {}", String::from_utf8_lossy(&output.stdout));
+                eprintln!("STDOUT: {}", String::from_utf8_lossy(&output.stdout));
             }
 
             Ok(output)
         } else {
-            debug!("status: {}", output.status);
+            eprintln!("status: {}", output.status);
 
             if !output.stderr.is_empty() {
-                warn!("STDERR: {}", String::from_utf8_lossy(&output.stderr));
+                eprintln!("STDERR: {}", String::from_utf8_lossy(&output.stderr));
             }
 
             Err(format_err!("run command failed, status={}", output.status))

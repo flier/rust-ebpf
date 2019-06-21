@@ -16,13 +16,10 @@ ebpf-build = "0.1"
 Then, compile and build the kernel file to eBPF object.
 
 ```rust
-use ebpf_build::Builder;
+extern crate ebpf_build;
 
 fn main() {
-    Builder::new()
-        .kernel("src/kernel.rs")
-        .build()
-        .expect("build eBPF kernel");
+    ebpf_build::Builder::new().build().expect("build kernel");
 }
 ```
 
